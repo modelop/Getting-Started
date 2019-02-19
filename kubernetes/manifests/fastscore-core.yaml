@@ -4,15 +4,17 @@
 #
 # fastscore/connect (as 'connect')
 # fastscore/dashboard (as 'dashboard')
+# fastscore/model-manage (as 'model-manage)
 # fastscore access (as 'access', based on NGINX open-source reverse proxy)
 # fastscore/scheduler (as 'scheduler', based on Airflow open-source scheduler)
+# fastscore/viz (as 'viz', based on Grafana open-source vizualization tool)
 #
 # NOTE: All directories mounted in the 'volumeMounts' sections of these deployments are
 # required for for services to run
 # 
 # NOTE: Any secrets or configMaps referred to in this manifest must be created outside of this file by running the appropriate commands
 # e.g. `kubectl create secret generic <secretname> --from-file=./path/to/file/containing/secret
-# See README.md in this project for more specific information
+# See README.md and/or Makefile in this project for more specific information
 
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -251,40 +253,30 @@ spec:
     spec:
       containers:
       - name: access
-        #image: fastscore/access:latest
-        image: gwlorence/access-testing:1.9-dev
+        image: fastscore/access:dev
         env:
-        # FASTSCORE_HOSTNAME should be set to the DNS name assigned to the Access service (this is required for SSO authentication and metadata)
-        - name: FASTSCORE_HOSTNAME
-          value: {{DNS_HOST}}
-        # Each service proxied through Access must have an entry here
-        # The values should be http or https locations that point to the service name as reachable through k8s DNS, along with the port the service is listening to
-        # They are set here to the default values, and commented to show they are not strictly necessary
+# Each service proxied through Access must have an entry here
+# The values should be http or https locations that point to the service name as reachable through k8s DNS, along with the port the service is listening to
+# They are set here to the default values, and commented to show they are not strictly necessary
 #        - name: FASTSCORE_PROXY
 #          value: https://dashboard:8000
 #        - name: FASTSCORE_LINEAGEDB
-#          value: https://lineagedb:8529
+#          value: http://lineagedb:8529
 #        - name: FASTSCORE_VIZ
-#          value: https://viz:3000
+#          value: http://viz:3000
 #        - name: FASTSCORE_SCHEDULER
 #          value: http://scheduler:8080
-#        - name: FASTSCORE_CLI_PORT
-#          value: 8000
-#        - name: FASTSCORE_AUTH_TYPE
-#          value: basicauth
+# SSL options to be overridden if you want to use a custom certificate/key
 #        - name: FASTSCORE_SSL_CERT_PATH
 #          value: /etc/nginx/dummy.crt
 #        - name: FASTSCORE_SSL_KEY_PATH
 #          value: /etc/nginx/dummy.key
+# FASTSCORE_AUTH_FILE should be mapped in as a configMap if you want to override the user/passwords Access uses (see Makefile)
         - name: FASTSCORE_AUTH_FILE
           value: /etc/nginx/cli/cli_passwd
         volumeMounts:
-        #We mount a few files/directories as configMaps in order to push custom information into Access without needing a custom image build.
-        #Access writes to the directories following the configMaps during normal operation
-#        - mountPath: /etc/nginx/conf.d
-#          name: nginx-config-volume
-#        - mountPath: /etc/nginx/conf.d/access
-#          name: nginx-configmap-volume
+# We mount a few files/directories as configMaps in order to push custom information into Access without needing a custom image build.
+# Access writes to the directories following the configMaps during normal operation
         - mountPath: /etc/nginx/cli
           name: cli-passwd-volume
         - mountPath: /var/run
@@ -295,32 +287,14 @@ spec:
           name: access-cache-dir
         ports:
         - containerPort: 8000
-        - containerPort: 443
-        - containerPort: 80
+        - containerPort: 4433
+        - containerPort: 8080
           protocol: TCP
         securityContext:
           runAsUser: 1005001
         resources: {}
         stdin: true
         tty: true
-# The following sections which reference 'vouch' are included for the future
-# in case we want to integrate with an OAuth/OpenID connect auth provider
-#      - name: vouch
-#        image: vouch/vouch-proxy:0.4.0
-#        # Vouch writes to /data during normal operation, and we map its config in with a configMap
-#        volumeMounts:
-#        - mountPath: /data
-#          name: vouch-data-volume
-#        - mountPath: /config
-#          name: vouch-configmap-volume
-#        ports:
-#        - containerPort: 9090
-#          protocol: TCP
-#        resources: {}
-#        stdin: true
-#        securityContext:
-#          runAsUser: 1005001
-#        tty: true
       volumes:
       - name: access-tmp-dir
         emptyDir: {}
@@ -328,19 +302,9 @@ spec:
         emptyDir: {}
       - name: access-cache-dir
         emptyDir: {}
-#      - name: vouch-data-volume
-#        emptyDir: {}
-      - name: nginx-config-volume
-        emptyDir: {}
-#      - name: vouch-configmap-volume
-#        configMap:
-#          name: vouch-configmap
       - name: cli-passwd-volume
         configMap:
           name: cli-passwd
-#      - name: nginx-configmap-volume
-#        configMap:
-#          name: nginx-configmap
       restartPolicy: Always
 status: {}
 ---
@@ -350,17 +314,19 @@ metadata:
   labels:
     service: access
     app: access
-    #This label is commented out for help with restarting dynamically-DNS'd cloud environments
-    #stack: fastscore
+# This label is commented out for help with restarting dynamically-DNS'd cloud environments
+#    stack: fastscore
   name: access
 spec:
   ports:
-  - name: 80-tcp
+  - name: http-port
     port: 80
     protocol: TCP
-  - name: 443-tcp
+    targetPort: 8080
+  - name: ssl-port
     port: 443
     protocol: TCP
+    targetPort: 4433
   - name: 8000-tcp
     port: 8000
     protocol: TCP
@@ -394,27 +360,27 @@ spec:
       - name: scheduler
         image: fastscore/scheduler:1.9
         env:
-        # We set a variety of Airflow-level configurations through the environment
+# We set a variety of Airflow-level configurations through the environment
         - name: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
           value: "true"
         - name: AIRFLOW__WEBSERVER__ENABLE_PROXY_FIX
           value: "true"
-        # BASE_URL needs to match the location defined in Access's configuration. This likely won't need to change.
+# BASE_URL needs to match the location defined in Access's configuration. This likely won't need to change.
         - name: AIRFLOW__WEBSERVER__BASE_URL
           value: "https://localhost/scheduler"
         - name: AIRFLOW__CORE__LOAD_EXAMPLES
           value: "false"
-          # This explicitly sets the Executor to "Sequential", which means
-          # "Use an internal sqlite DB for metadata; don't connect to an outside service
+# This explicitly sets the Executor to "Sequential", which means
+# "Use an internal sqlite DB for metadata; don't connect to an outside service
         - name: AIRFLOW__CORE__EXECUTOR
           value: "SequentialExecutor"
         - name: AIRFLOW_HOME
           value: "/usr/local/airflow"
-          # This must point to a writeable directory (defined in the volumeMounts section)
-          # Also note that there must be four slashes before the path
+# This must point to a writeable directory (defined in the volumeMounts section)
+# Also note that there must be four slashes before the path
         - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
           value: "sqlite:////usr/local/airflow/persistent/airflow.db"
-        # We use configMaps to map in DAGs and associated scripts; the directories after that are written to during normal operation
+# We use configMaps to map in DAGs and associated scripts; the directories after that are written to during normal operation
         volumeMounts:
         - mountPath: /usr/local/airflow/dags
           name: airflow-dags-configmap-volume
@@ -431,6 +397,9 @@ spec:
         resources: {}
         stdin: true
         tty: true
+# 'fsGroup' setting is required for permissions to the persistentVolumeClaim
+      securityContext:
+        fsGroup: 1000
       volumes:
       - emptyDir: {}
         name: home-dir
@@ -448,7 +417,7 @@ spec:
       - name: airflow-processing-configmap-volume
         configMap:
           name: airflow-processing-configmap
-      - name: scheduler-matadata-db
+      - name: scheduler-metadata-db
         persistentVolumeClaim:
           claimName: scheduler-disk
       restartPolicy: Always
@@ -511,6 +480,7 @@ spec:
         env:
         - name: GF_AUTH_ANONYMOUS_ENABLED
           value: "true"
+# ROOT_URL needs to be set to this for Access reverse-proxy to function properly
         - name: GF_SERVER_ROOT_URL
           value: "%(protocol)s://%(domain)s/viz/"
         ports:
@@ -519,6 +489,7 @@ spec:
         resources: {}
         stdin: true
         tty: true
+# 'fsGroup' setting is required for permissions to the persistentVolumeClaim
       securityContext:
         fsGroup: 472
       volumes:
