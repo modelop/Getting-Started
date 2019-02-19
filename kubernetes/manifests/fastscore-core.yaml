@@ -552,6 +552,10 @@ spec:
         resources: {}
         stdin: true
         tty: true
+        securityContext:
+          runAsUser: 1005001
+      securityContext:
+        fsGroup: 1005001
       restartPolicy: Always
 status: {}
 ---
