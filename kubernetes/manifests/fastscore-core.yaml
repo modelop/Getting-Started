@@ -338,7 +338,7 @@ spec:
     service: access
     app: access
   sessionAffinity: None
-  type: LoadBalancer
+  type: NodePort
 status:
   loadBalancer: {}
 ---
