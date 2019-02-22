@@ -23,7 +23,7 @@
 
 .PHONY: deploy config clean configmap cleanupconfigmap secrets cleanupsecrets 
 
-deploy: secrets configmap stack
+deploy: configmap stack
 
 stack:
 	kubectl apply -f manifests/
@@ -33,10 +33,12 @@ clean: cleanupconfigmap cleanupsecrets
 
 configmap: cleanupconfigmap
 	kubectl create configmap cli-passwd --from-file=config/cli_passwd || echo "done"
+	kubectl create configmap nginx-configmap --from-file=config/nginx_config/ || echo "done"
 	kubectl create configmap airflow-dags-configmap --from-file=config/airflow_config/dags || echo "done"
 	kubectl create configmap airflow-processing-configmap --from-file=config/airflow_config/processing || echo "done"
 
 cleanupconfigmap:
+	kubectl delete configmap nginx-configmap || echo "done"
 	kubectl delete configmap cli-passwd || echo "done"
 	kubectl delete configmap airflow-dags-configmap || echo "done"
 	kubectl delete configmap airflow-processing-configmap || echo "done"

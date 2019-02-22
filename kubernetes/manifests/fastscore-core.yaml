@@ -62,11 +62,11 @@ spec:
                   name: engine-3
 
               db:
-                type: git
-                url: {{GIT_URL}}
-                branch: {{GIT_BRANCH}}
-                username: secret://git-username
-                password: secret://git-password
+                type: mysql
+                host: database
+                port: 3306
+                username: root
+                password: root
 
               pneumo:
                 type: REST
@@ -186,9 +186,6 @@ spec:
           name: git-dir
         - mountPath: /fastscore/log
           name: log-dir
-        - mountPath: "/tmp/secrets"
-          name: model-manage-secrets
-          readOnly: true
         env:
         - name: CONNECT_PREFIX
           value: https://connect:8001
@@ -205,9 +202,6 @@ spec:
         name: git-dir
       - emptyDir: {}
         name: log-dir
-      - name: model-manage-secrets
-        secret:
-          secretName: credentials
       restartPolicy: Always
 status: {}
 ---
@@ -254,6 +248,7 @@ spec:
       containers:
       - name: access
         image: fastscore/access:dev
+        imagePullPolicy: Always
         env:
 # Each service proxied through Access must have an entry here
 # The values should be http or https locations that point to the service name as reachable through k8s DNS, along with the port the service is listening to
@@ -272,13 +267,17 @@ spec:
 #        - name: FASTSCORE_SSL_KEY_PATH
 #          value: /etc/nginx/dummy.key
 # FASTSCORE_AUTH_FILE should be mapped in as a configMap if you want to override the user/passwords Access uses (see Makefile)
-        - name: FASTSCORE_AUTH_FILE
-          value: /etc/nginx/cli/cli_passwd
+#        - name: FASTSCORE_AUTH_FILE
+#          value: /etc/nginx/cli/cli_passwd
         volumeMounts:
 # We mount a few files/directories as configMaps in order to push custom information into Access without needing a custom image build.
 # Access writes to the directories following the configMaps during normal operation
-        - mountPath: /etc/nginx/cli
-          name: cli-passwd-volume
+#        - mountPath: /etc/nginx/cli
+#          name: cli-passwd-volume
+        - mountPath: /etc/nginx/conf.d/access
+          name: nginx-configmap-volume
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-config-dir
         - mountPath: /var/run
           name: access-run-dir
         - mountPath: /tmp
@@ -296,15 +295,20 @@ spec:
         stdin: true
         tty: true
       volumes:
+      - name: nginx-configmap-volume
+        configMap:
+          name: nginx-configmap
       - name: access-tmp-dir
         emptyDir: {}
       - name: access-run-dir
         emptyDir: {}
+      - name: nginx-config-dir
+        emptyDir: {}
       - name: access-cache-dir
         emptyDir: {}
-      - name: cli-passwd-volume
-        configMap:
-          name: cli-passwd
+#      - name: cli-passwd-volume
+#        configMap:
+#          name: cli-passwd
       restartPolicy: Always
 status: {}
 ---
@@ -367,7 +371,7 @@ spec:
           value: "true"
 # BASE_URL needs to match the location defined in Access's configuration. This likely won't need to change.
         - name: AIRFLOW__WEBSERVER__BASE_URL
-          value: "https://localhost/scheduler"
+          value: "http://localhost/scheduler"
         - name: AIRFLOW__CORE__LOAD_EXAMPLES
           value: "false"
 # This explicitly sets the Executor to "Sequential", which means
@@ -418,8 +422,7 @@ spec:
         configMap:
           name: airflow-processing-configmap
       - name: scheduler-metadata-db
-        persistentVolumeClaim:
-          claimName: scheduler-disk
+        emptyDir: {}
       restartPolicy: Always
 status: {}
 ---
@@ -494,8 +497,7 @@ spec:
         fsGroup: 472
       volumes:
       - name: grafana-metadata-db
-        persistentVolumeClaim:
-          claimName: viz-disk
+        emptyDir: {}
       restartPolicy: Always
 status: {}
 ---

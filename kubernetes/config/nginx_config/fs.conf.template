@@ -1,0 +1,256 @@
+# This config assumes the container has the following ENV variables set:
+# FASTSCORE_PROXY=https://dns-name-of-dashboard-or-frontman:port
+# FASTSCORE_VIZ=http://dns-name-of-fastscore-viz:port
+# FASTSCORE_SCHEDULER=http://dns-name-of-scheduler:port
+
+log_format short '$remote_addr - $remote_user [$time_local] "$request" $status';
+
+# This will redirect all port-80 traffic (http) to port 443 (https)
+#server {
+#	# We listen to 8080 instead of 80 so we can run as a non-root user and still work
+#	# This port should be mapped to 80 with a kubernetes service/OpenShift route/etc.
+#	listen 8080 default_server;
+#	return 301 https://$host$request_uri;
+#	}
+
+server {
+	# We listen to 4433 instead of 443 so we can run as a non-root user and still work
+	# This port should be mapped to 443 with a kubernetes service/OpenShift route/etc.
+#	listen 4433 ssl;
+
+	# Testing to see if this works without an SSL connection to access...
+	listen 8080 default_server;
+
+	# This disables client-size data checking, which we do to allow abritrarily large files to be uploaded as attachments or REST files
+	client_max_body_size 0;
+	
+	#Increase timeouts to allow for larger attachments
+	proxy_connect_timeout       600;
+	proxy_send_timeout          600;
+	proxy_read_timeout          600;
+	send_timeout                600;
+
+	access_log /tmp/access.log short;
+
+	#The CERT_PATH and KEY_PATH default to certs located in 
+#	ssl_certificate ${FASTSCORE_SSL_CERT_PATH};
+#	ssl_certificate_key ${FASTSCORE_SSL_KEY_PATH};
+#	ssl_verify_client off;
+
+#	Leaving this here for future integration of Vouch
+#	location /authorize {
+#	        proxy_set_header X-Forwarded-Proto https;
+#		auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+#		auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+#		auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
+#		auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
+#		# It is critical that we set the Host proxy header everywhere we forward
+#		# to the vouch server (localhost:9090) - it is the only way user whitelisting works
+#		proxy_set_header Host ${FASTSCORE_HOSTNAME};
+#		proxy_pass http://localhost:9090;
+#	}
+#
+#	location /login {
+#	        proxy_set_header X-Forwarded-Proto https;
+#		auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+#		auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+#		auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
+#		auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
+#		# It is critical that we set the Host proxy header everywhere we forward
+#		# to the vouch server (localhost:9090) - it is the only way user whitelisting works
+#		proxy_set_header Host ${FASTSCORE_HOSTNAME};
+#		proxy_pass http://localhost:9090;
+#	}
+#
+#	location = /validate {
+#		proxy_pass_request_body off; # no need to send the POST body
+#
+#		proxy_set_header Content-Length "";
+#		proxy_set_header X-Real-IP $remote_addr;
+#		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#		proxy_set_header X-Forwarded-Proto $scheme;
+#
+#		# Pass X-Vouch-User along with the request
+#		auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
+#
+#		# these return values are passed to the @error401 call
+#		auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+#		auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+#		auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
+#
+#		proxy_set_header Host ${FASTSCORE_HOSTNAME};
+#		# This address is the address upon which Vouch will be listening
+#		proxy_pass http://localhost:9090;
+#	}
+#
+#	error_page 401 = @error401;
+#
+#	# If the user is not logged in, redirect them to Vouch's login URL
+#	location @error401 {
+#		if ($auth_type = "vouch") {
+#			return 302 https://${FASTSCORE_HOSTNAME}/login?url=https://$http_host$request_uri&vouch-failcount=$auth_resp_failcount&X-Vouch-Token=$auth_resp_jwt&error=$auth_resp_err;
+#		}
+#	}
+	
+	# Proxy fastscore/dashboard UI
+	location /dashboard {
+#		# Leaving this here for future Vouch integration
+#		# Required for vouch/OAuth integration
+#		auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+#		auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+#		auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
+#		auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
+#		auth_request /validate;
+		# Fastscore stuff
+		proxy_set_header X-Forwarded-Proto https;
+		proxy_set_header x-fastscore-user $remote_user;
+		proxy_set_header X-Real-IP  $remote_addr;
+		proxy_set_header X-Forwarded-For $remote_addr;
+		proxy_set_header Connection "Upgrade";
+		proxy_set_header Upgrade $http_upgrade;
+		# Using basic_auth
+		auth_basic "Admin Area";
+		auth_basic_user_file ${FASTSCORE_AUTH_FILE};
+		proxy_pass ${FASTSCORE_PROXY};
+	}
+	
+	# Redirect /scheduler to /scheduler/
+	location /scheduler {
+#		return 301 https://$host/scheduler/;
+		return 301 http://$host/scheduler/;
+	}
+
+	# Redirect /admin/ to go to scheduler as well
+	# This is required to work around a bug in Airflow's GUI when manually kicking off a run
+	location /admin/ {
+#		return 301 https://$host/scheduler/;
+		return 301 http://$host/scheduler/;
+	}
+
+	# Proxy fastscore/scheduler
+	location /scheduler/ {
+		alias /scheduler/admin/;
+		#Fastscore stuff
+		proxy_set_header x-fastscore-user $remote_user;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-Proto https;
+		proxy_set_header X-Forwarded-Ssl on;
+		# Scheduler-specific things below
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header Host $http_host;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+		proxy_http_version 1.1;
+		proxy_redirect off;
+		proxy_buffering off;
+		# Using basic_auth
+		auth_basic "Admin Area";
+		auth_basic_user_file ${FASTSCORE_AUTH_FILE};
+		proxy_pass ${FASTSCORE_SCHEDULER};
+	}
+
+	# Redirect /viz to /viz/
+	location /viz {
+#		return 301 https://$host/viz/;
+		return 301 http://$host/viz/;
+	}
+
+	# Proxy fastscore/viz
+	location /viz/ {
+#		# Leaving this here for future Vouch integration
+#		# Required for vouch/OAuth integration
+#		auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+#		auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+#		auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
+#		auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
+#		auth_request /validate;
+		# Fastscore stuff
+		proxy_set_header X-Forwarded-Proto https;
+		proxy_set_header x-fastscore-user $remote_user;
+		proxy_set_header X-Real-IP  $remote_addr;
+		proxy_set_header X-Forwarded-For $remote_addr;
+		proxy_set_header Connection "Upgrade";
+		proxy_set_header Upgrade $http_upgrade;
+		# Set header properly, then proxy to viz
+	        proxy_set_header Authorization "";
+		# Using basic_auth
+		auth_basic "Admin Area";
+		auth_basic_user_file ${FASTSCORE_AUTH_FILE};
+		# The trailing / here is incredibly important. I wish I were kidding.
+		proxy_pass ${FASTSCORE_VIZ}/;
+	}
+}
+#	Leaving this here for if/when we integrate lineagedb's UI
+#	# Proxy fastscore/lineagedb
+#	location /lineage/ {
+#		# Leaving this here for future Vouch integration
+#		# Required for vouch/OAuth integration
+#		auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+#		auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+#		auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
+#		auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
+#		auth_request /validate;
+#		# Fastscore stuff
+#		proxy_set_header X-Forwarded-Proto https;
+#		proxy_set_header x-fastscore-user $remote_user;
+#		proxy_set_header X-Real-IP  $remote_addr;
+#		proxy_set_header X-Forwarded-For $remote_addr;
+#		proxy_set_header Connection "Upgrade";
+#		proxy_set_header Upgrade $http_upgrade;
+#		# Using basic_auth
+#		auth_basic "Admin Area";
+#		auth_basic_user_file ${FASTSCORE_AUTH_FILE};
+#		proxy_pass ${FASTSCORE_LINEAGEDB};
+#	}
+#
+#	Leaving this here for when we integrate designer's UI
+#	# Proxy fastscore/designer
+#	location /designer/ {
+#		# Leaving this here for future Vouch integration
+#		# Required for vouch/OAuth integration
+#		auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+#		auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+#		auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
+#		auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
+#		auth_request /validate;
+#		# Required for vouch/OAuth integration
+#		auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+#		auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+#		auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
+#		auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
+#		proxy_set_header X-Vouch-User $auth_resp_x_vouch_user;
+#		# Fastscore stuff
+#		proxy_set_header X-Forwarded-Proto https;
+#		proxy_set_header x-fastscore-user $remote_user;
+#		proxy_set_header X-Real-IP  $remote_addr;
+#		proxy_set_header X-Forwarded-For $remote_addr;
+#		proxy_set_header Connection "Upgrade";
+#		proxy_set_header Upgrade $http_upgrade;
+#		# Set header properly, then proxy to viz
+#		proxy_pass ${FASTSCORE_DESIGNER};
+#	}
+# Example of non-standard port server
+
+#server {
+#	listen ${FASTSCORE_CLI_PORT} ssl;
+#
+#	# Handle HTTP->HTTPS redirects when using custom port
+#	error_page 497 https://$host:${FASTSCORE_CLI_PORT}$request_uri;
+#	#
+#	# Allow arbitrarily large attachments
+#	client_max_body_size 0;
+#
+#	ssl_certificate ${FASTSCORE_SSL_CERT_PATH};
+#	ssl_certificate_key ${FASTSCORE_SSL_KEY_PATH};
+#	ssl_verify_client off;
+#
+#	location / {
+#		auth_basic "Admin Area";
+#		auth_basic_user_file /etc/nginx/cli/cli_passwd;
+#
+#		proxy_set_header x-fastscore-user $remote_user;
+#		proxy_set_header Connection "Upgrade";
+#		proxy_set_header Upgrade $http_upgrade;
+#		proxy_pass ${FASTSCORE_PROXY};
+#	}
+#}
