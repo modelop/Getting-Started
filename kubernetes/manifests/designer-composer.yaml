@@ -1,0 +1,179 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: proxy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: proxy
+        app: proxy
+        stack: fastscore
+    spec:
+      containers:
+      - name: proxy
+        image: fastscore/frontman:1.9
+        env:
+        - name: CONNECT_PREFIX
+          value: https://connect:8001
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+      securityContext:
+        runAsUser: 1005001
+      volumes:
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: proxy
+    app: proxy
+    stack: fastscore
+  name: proxy
+spec:
+  ports:
+  - name: 8000-tcp
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    service: proxy
+    app: proxy
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: designer
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: designer
+        app: designer
+        stack: fastscore
+    spec:
+      containers:
+      - name: designer
+        image: fastscore/designer:dev
+        volumeMounts:
+        - mountPath: /cache/workflows
+          name: workflow-dir
+        - mountPath: /cache/config
+          name: config-dir
+        ports:
+        - containerPort: 8012
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+      securityContext:
+        runAsUser: 1005001
+      volumes:
+        - name: workflow-dir
+          emptyDir: {}
+        - name: config-dir
+          emptyDir: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: designer
+    app: designer
+    stack: fastscore
+  name: designer
+spec:
+  ports:
+  - name: 8012-tcp
+    port: 8012
+    protocol: TCP
+    targetPort: 8012
+  selector:
+    service: designer
+    app: designer
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: composer
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: composer
+        app: composer
+        stack: fastscore
+    spec:
+      containers:
+      - name: composer
+        image: fastscore/composer:dev
+        volumeMounts:
+        - mountPath: /connect/log
+          name: log-dir
+        env:
+        - name: CONNECT_PREFIX
+          value: https://connect:8001
+        - name: CONDUCTOR_HOST
+          value: https://conductor:8011
+        - name: PROXY
+          value: https://proxy:8000
+        - name: MODE
+          value: New
+        - name: TRANSPORT
+          value: Kafka
+        - name: KAFKA_SERVERS
+          value: kafka:9092
+        ports:
+        - containerPort: 8010
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+      securityContext:
+        runAsUser: 1005001
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: composer
+    app: composer
+    stack: fastscore
+  name: composer
+spec:
+  ports:
+  - name: 8010-tcp
+    port: 8010
+    protocol: TCP
+    targetPort: 8010
+  selector:
+    service: composer
+    app: composer
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
