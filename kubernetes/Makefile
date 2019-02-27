@@ -22,6 +22,7 @@
 ######################
 
 .PHONY: deploy config clean configmap cleanupconfigmap secrets cleanupsecrets parameters
+=======
 
 deploy: secrets configmap stack
 

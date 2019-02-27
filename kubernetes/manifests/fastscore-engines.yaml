@@ -41,8 +41,6 @@ spec:
         resources: {}
         stdin: true
         tty: true
-      imagePullSecrets:
-      - name: regcred
       volumes:
       - emptyDir: {}
         name: log-dir
@@ -114,8 +112,6 @@ spec:
         resources: {}
         stdin: true
         tty: true
-      imagePullSecrets:
-      - name: regcred
       volumes:
       - emptyDir: {}
         name: log-dir
@@ -187,8 +183,6 @@ spec:
         resources: {}
         stdin: true
         tty: true
-      imagePullSecrets:
-      - name: regcred
       volumes:
       - emptyDir: {}
         name: log-dir

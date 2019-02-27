@@ -1,0 +1,583 @@
+# Manifest file that describes kubernetes 'deployments' and supporting 'services'
+# for the fastscore demo environment in aws-nonprod
+# Microservices included are:
+#
+# fastscore/connect (as 'connect')
+# fastscore/dashboard (as 'dashboard')
+# fastscore/model-manage (as 'model-manage)
+# fastscore access (as 'access', based on NGINX open-source reverse proxy)
+# fastscore/scheduler (as 'scheduler', based on Airflow open-source scheduler)
+# fastscore/viz (as 'viz', based on Grafana open-source vizualization tool)
+#
+# NOTE: All directories mounted in the 'volumeMounts' sections of these deployments are
+# required for for services to run
+# 
+# NOTE: Any secrets or configMaps referred to in this manifest must be created outside of this file by running the appropriate commands
+# e.g. `kubectl create secret generic <secretname> --from-file=./path/to/file/containing/secret
+# See README.md and/or Makefile in this project for more specific information
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: connect
+  labels:
+    service: connect
+    app: connect
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: connect
+        app: connect
+        stack: fastscore
+    spec:
+      containers:
+      - name: connect
+        image: fastscore/connect:1.9
+        volumeMounts:
+        - mountPath: /connect/log
+          name: log-dir
+        env:
+        - name: FASTSCORE_CONFIG
+          value: |
+            fastscore:
+              fleet:
+                - api: model-manage
+                  host: model-manage
+                  port: 8002
+                - api: engine
+                  host: engine-1
+                  port: 8003
+                  name: engine-1
+                - api: engine
+                  host: engine-2
+                  port: 8003
+                  name: engine-2
+                - api: engine
+                  host: engine-3
+                  port: 8003
+                  name: engine-3
+
+              db:
+                type: git
+                url: {{GIT_URL}}
+                branch: {{GIT_BRANCH}}
+                username: secret://git-username
+                password: secret://git-password
+
+              pneumo:
+                type: REST
+        ports:
+        - containerPort: 8001
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+      volumes:
+      - emptyDir: {}
+        name: log-dir
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: connect
+    app: connect
+    stack: fastscore
+  name: connect
+spec:
+  ports:
+  - name: 8001-tcp
+    port: 8001
+    protocol: TCP
+    targetPort: 8001
+  selector:
+    service: connect
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: dashboard
+  labels:
+    service: dashboard
+    app: dashboard
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: dashboard
+        app: dashboard
+        stack: fastscore
+    spec:
+      containers:
+      - name: dashboard
+        image: fastscore/dashboard:new
+        env:
+        - name: CONNECT_PREFIX
+          value: https://connect:8001
+        - name: BASE_PATH
+          value: /dashboard
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: dashboard
+    app: dashboard
+    stack: fastscore
+  name: dashboard
+spec:
+  ports:
+  - name: 8000-tcp
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    service: dashboard
+    app: dashboard
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: model-manage
+  labels:
+    service: model-manage
+    app: model-manage
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: model-manage
+        app: model-manage
+        stack: fastscore
+    spec:
+      containers:
+      - name: model-manage
+        image: fastscore/model-manage:dev
+        volumeMounts:
+        - mountPath: /tmp/
+          name: git-dir
+        - mountPath: /fastscore/log
+          name: log-dir
+        - mountPath: "/tmp/secrets"
+          name: model-manage-secrets
+          readOnly: true
+        env:
+        - name: CONNECT_PREFIX
+          value: https://connect:8001
+        - name: SECRET_PATH_ROOT
+          value: /tmp/secrets
+        ports:
+        - containerPort: 8002
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+      volumes:
+      - emptyDir: {}
+        name: git-dir
+      - emptyDir: {}
+        name: log-dir
+      - name: model-manage-secrets
+        secret:
+          secretName: credentials
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: model-manage
+    app: model-manage
+    stack: fastscore
+  name: model-manage
+spec:
+  ports:
+  - name: 8002-tcp
+    port: 8002
+    protocol: TCP
+    targetPort: 8002
+  selector:
+    service: model-manage
+    app: model-manage
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: access
+  labels:
+    service: access
+    app: access
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: access
+        app: access
+        stack: fastscore
+    spec:
+      containers:
+      - name: access
+        image: fastscore/access:dev
+        env:
+# Each service proxied through Access must have an entry here
+# The values should be http or https locations that point to the service name as reachable through k8s DNS, along with the port the service is listening to
+# They are set here to the default values, and commented to show they are not strictly necessary
+#        - name: FASTSCORE_PROXY
+#          value: https://dashboard:8000
+#        - name: FASTSCORE_LINEAGEDB
+#          value: http://lineagedb:8529
+#        - name: FASTSCORE_VIZ
+#          value: http://viz:3000
+#        - name: FASTSCORE_SCHEDULER
+#          value: http://scheduler:8080
+# SSL options to be overridden if you want to use a custom certificate/key
+#        - name: FASTSCORE_SSL_CERT_PATH
+#          value: /etc/nginx/dummy.crt
+#        - name: FASTSCORE_SSL_KEY_PATH
+#          value: /etc/nginx/dummy.key
+# FASTSCORE_AUTH_FILE should be mapped in as a configMap if you want to override the user/passwords Access uses (see Makefile)
+        - name: FASTSCORE_AUTH_FILE
+          value: /etc/nginx/cli/cli_passwd
+        volumeMounts:
+# We mount a few files/directories as configMaps in order to push custom information into Access without needing a custom image build.
+# Access writes to the directories following the configMaps during normal operation
+        - mountPath: /etc/nginx/cli
+          name: cli-passwd-volume
+        - mountPath: /var/run
+          name: access-run-dir
+        - mountPath: /tmp
+          name: access-tmp-dir
+        - mountPath: /var/cache/nginx
+          name: access-cache-dir
+        ports:
+        - containerPort: 8000
+        - containerPort: 4433
+        - containerPort: 8080
+          protocol: TCP
+        securityContext:
+          runAsUser: 1005001
+        resources: {}
+        stdin: true
+        tty: true
+      volumes:
+      - name: access-tmp-dir
+        emptyDir: {}
+      - name: access-run-dir
+        emptyDir: {}
+      - name: access-cache-dir
+        emptyDir: {}
+      - name: cli-passwd-volume
+        configMap:
+          name: cli-passwd
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: access
+    app: access
+# This label is commented out for help with restarting dynamically-DNS'd cloud environments
+#    stack: fastscore
+  name: access
+spec:
+  ports:
+  - name: http-port
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  - name: ssl-port
+    port: 443
+    protocol: TCP
+    targetPort: 4433
+  - name: 8000-tcp
+    port: 8000
+    protocol: TCP
+  selector:
+    service: access
+    app: access
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: scheduler
+  labels:
+    service: scheduler
+    app: scheduler
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: scheduler
+        app: scheduler
+        stack: fastscore
+    spec:
+      containers:
+      - name: scheduler
+        image: fastscore/scheduler:1.9
+        env:
+# We set a variety of Airflow-level configurations through the environment
+        - name: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
+          value: "true"
+        - name: AIRFLOW__WEBSERVER__ENABLE_PROXY_FIX
+          value: "true"
+# BASE_URL needs to match the location defined in Access's configuration. This likely won't need to change.
+        - name: AIRFLOW__WEBSERVER__BASE_URL
+          value: "https://localhost/scheduler"
+        - name: AIRFLOW__CORE__LOAD_EXAMPLES
+          value: "false"
+# This explicitly sets the Executor to "Sequential", which means
+# "Use an internal sqlite DB for metadata; don't connect to an outside service
+        - name: AIRFLOW__CORE__EXECUTOR
+          value: "SequentialExecutor"
+        - name: AIRFLOW_HOME
+          value: "/usr/local/airflow"
+# This must point to a writeable directory (defined in the volumeMounts section)
+# Also note that there must be four slashes before the path
+        - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+          value: "sqlite:////usr/local/airflow/persistent/airflow.db"
+# We use configMaps to map in DAGs and associated scripts; the directories after that are written to during normal operation
+        volumeMounts:
+        - mountPath: /usr/local/airflow/dags
+          name: airflow-dags-configmap-volume
+        - mountPath: /usr/local/airflow/processing
+          name: airflow-processing-configmap-volume
+        - mountPath: /usr/local/airflow
+          name: home-dir 
+        - mountPath: /usr/local/airflow/bin
+          name: bin-dir 
+        - mountPath: /usr/local/airflow/logs
+          name: log-dir 
+        - mountPath: /usr/local/airflow/persistent
+          name: scheduler-metadata-db
+        resources: {}
+        stdin: true
+        tty: true
+# 'fsGroup' setting is required for permissions to the persistentVolumeClaim
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - emptyDir: {}
+        name: home-dir
+      - emptyDir: {}
+        name: bin-dir
+      - emptyDir: {}
+        name: dag-dir
+      - emptyDir: {}
+        name: proc-dir
+      - emptyDir: {}
+        name: log-dir
+      - name: airflow-dags-configmap-volume
+        configMap:
+          name: airflow-dags-configmap
+      - name: airflow-processing-configmap-volume
+        configMap:
+          name: airflow-processing-configmap
+      - name: scheduler-metadata-db
+        persistentVolumeClaim:
+          claimName: scheduler-disk
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: scheduler
+    app: scheduler
+    stack: fastscore
+  name: scheduler
+spec:
+  ports:
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: 5555-tcp
+    port: 5555
+    protocol: TCP
+    targetPort: 5555
+  - name: 8793-tcp
+    port: 8793
+    protocol: TCP
+    targetPort: 8793
+  selector:
+    service: scheduler
+    app: scheduler
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: viz
+  labels:
+    service: viz
+    app: viz
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: viz
+        app: viz
+        stack: fastscore
+    spec:
+      containers:
+      - name: viz
+        image: fastscore/viz:dev
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: grafana-metadata-db
+        env:
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: "true"
+# ROOT_URL needs to be set to this for Access reverse-proxy to function properly
+        - name: GF_SERVER_ROOT_URL
+          value: "%(protocol)s://%(domain)s/viz/"
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+# 'fsGroup' setting is required for permissions to the persistentVolumeClaim
+      securityContext:
+        fsGroup: 472
+      volumes:
+      - name: grafana-metadata-db
+        persistentVolumeClaim:
+          claimName: viz-disk
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: viz
+    app: viz
+    stack: fastscore
+  name: viz
+spec:
+  ports:
+  - name: 3000-tcp
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    service: viz
+    app: viz
+    stack: fastscore
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: lineagedb
+  labels:
+    service: lineagedb
+    app: lineagedb
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: lineagedb
+        app: lineagedb
+        stack: fastscore
+    spec:
+      containers:
+      - name: lineagedb
+        image: fastscore/lineagedb:1.9
+        env:
+        - name: ARANGO_NO_AUTH
+          value: "1"
+        ports:
+        - containerPort: 8529
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+        securityContext:
+          runAsUser: 1005001
+      securityContext:
+        fsGroup: 1005001
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: lineagedb
+    app: lineagedb
+    stack: fastscore
+  name: lineagedb
+spec:
+  ports:
+  - name: 8529-tcp
+    port: 8529
+    protocol: TCP
+    targetPort: 8529
+  selector:
+    service: lineagedb
+    app: lineagedb
+    stack: fastscore
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
