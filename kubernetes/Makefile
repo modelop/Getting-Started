@@ -21,8 +21,7 @@
 #  Stack Deployment  #
 ######################
 
-.PHONY: deploy config clean configmap cleanupconfigmap secrets cleanupsecrets parameters
-=======
+.PHONY: deploy config clean configmap cleanupconfigmap secrets cleanupsecrets 
 
 deploy: secrets configmap stack
 
@@ -50,9 +49,3 @@ cli-passwords:
 
 cleanupsecrets:
 	kubectl delete secrets --all
-
-environment:
-	bash -c "scripts/replace_parameters.sh translate ./parameters.txt ./templates/ ./manifests/"
-	
-parameters:
-	scripts/replace_parameters.sh discover ./templates/ >> parameters.txt
