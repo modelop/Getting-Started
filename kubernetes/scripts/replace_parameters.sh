@@ -45,7 +45,7 @@ elif [ "$1" = "discover" ]; then
     exit 1
   fi
   IN=$2
-  cat $IN/* | awk '{ gsub(/\${/,"\n${"); print }' | sed -n 's/${\(.*\)}/\1/p' | uniq
+  cat $IN/* | awk '{ gsub(/\${/,"\n${"); print }' | sed -n 's/${\(.*\)}/\1=/p' | uniq
 else
   echo "Usage:"
   echo "  conf.sh translate"

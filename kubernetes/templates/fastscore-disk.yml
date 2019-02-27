@@ -9,7 +9,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: gp2
+  storageClassName: ${SC_NAME}
   resources:
     requests:
       storage: 1Gi
@@ -23,7 +23,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: gp2
+  storageClassName: ${SC_NAME}
   resources:
     requests:
       storage: 1Gi

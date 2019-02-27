@@ -1,19 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: proxy
+  name: frontman
 spec:
   replicas: 1
   template:
     metadata:
       annotations:
       labels:
-        service: proxy
-        app: proxy
+        service: frontman
+        app: frontman
         stack: fastscore
     spec:
       containers:
-      - name: proxy
+      - name: frontman
         image: fastscore/frontman:1.9
         env:
         - name: CONNECT_PREFIX
@@ -24,8 +24,8 @@ spec:
         resources: {}
         stdin: true
         tty: true
-      securityContext:
-        runAsUser: 1005001
+#      securityContext:
+#        runAsUser: 1005001
       volumes:
       restartPolicy: Always
 status: {}
@@ -34,10 +34,10 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    service: proxy
-    app: proxy
+    service: frontman
+    app: frontman
     stack: fastscore
-  name: proxy
+  name: frontman
 spec:
   ports:
   - name: 8000-tcp
@@ -45,8 +45,8 @@ spec:
     protocol: TCP
     targetPort: 8000
   selector:
-    service: proxy
-    app: proxy
+    service: frontman
+    app: frontman
   sessionAffinity: None
   type: ClusterIP
 status:
@@ -138,7 +138,7 @@ spec:
         - name: CONDUCTOR_HOST
           value: https://conductor:8011
         - name: PROXY
-          value: https://proxy:8000
+          value: https://frontman:8000
         - name: MODE
           value: New
         - name: TRANSPORT
@@ -151,8 +151,11 @@ spec:
         resources: {}
         stdin: true
         tty: true
-      securityContext:
-        runAsUser: 1005001
+      volumes:
+        - name: log-dir
+          emptyDir: {}
+#      securityContext:
+#        runAsUser: 1005001
       restartPolicy: Always
 status: {}
 ---
