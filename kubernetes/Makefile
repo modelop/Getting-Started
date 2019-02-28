@@ -35,11 +35,13 @@ configmap: cleanupconfigmap
 	kubectl create configmap cli-passwd --from-file=config/cli_passwd || echo "done"
 	kubectl create configmap airflow-dags-configmap --from-file=config/airflow_config/dags || echo "done"
 	kubectl create configmap airflow-processing-configmap --from-file=config/airflow_config/processing || echo "done"
+	kubectl create configmap fastscore-configmap --from-file=config/fastscore_config.yaml || echo "done"
 
 cleanupconfigmap:
 	kubectl delete configmap cli-passwd || echo "done"
 	kubectl delete configmap airflow-dags-configmap || echo "done"
 	kubectl delete configmap airflow-processing-configmap || echo "done"
+	kubectl delete configmap fastscore-configmap || echo "done"
 
 secrets: 
 	kubectl create -f config/secrets.yaml || echo "done"
@@ -49,3 +51,11 @@ cli-passwords:
 
 cleanupsecrets:
 	kubectl delete secrets --all
+
+parameters:
+	bash -c "./scripts/replace_parameters.sh discover ./templates/config/ >> config-parameters.txt"
+	bash -c "./scripts/replace_parameters.sh discover ./templates/manifests/ >> env-parameters.txt"
+
+environment:
+	bash -c "./scripts/replace_parameters.sh translate ./env-parameters.txt ./templates/manifests/ ./manifests/"
+	bash -c "./scripts/replace_parameters.sh translate ./config-parameters.txt ./templates/config/ ./config/"

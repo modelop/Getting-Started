@@ -36,40 +36,45 @@ spec:
     spec:
       containers:
       - name: connect
-        image: fastscore/connect:1.9
+        image: fastscore/connect:dev
         volumeMounts:
         - mountPath: /connect/log
           name: log-dir
+        - mountPath: /tmp/fastscore_config.yaml
+          subPath: fastscore_config.yaml
+          name: fastscore-configmap-volume
         env:
-        - name: FASTSCORE_CONFIG
-          value: |
-            fastscore:
-              fleet:
-                - api: model-manage
-                  host: model-manage
-                  port: 8002
-                - api: engine
-                  host: engine-1
-                  port: 8003
-                  name: engine-1
-                - api: engine
-                  host: engine-2
-                  port: 8003
-                  name: engine-2
-                - api: engine
-                  host: engine-3
-                  port: 8003
-                  name: engine-3
-
-              db:
-                type: git
-                url: {{GIT_URL}}
-                branch: {{GIT_BRANCH}}
-                username: secret://git-username
-                password: secret://git-password
-
-              pneumo:
-                type: REST
+        - name: FASTSCORE_CONFIG_FILE
+          value: /tmp/fastscore_config.yaml
+#        - name: FASTSCORE_CONFIG
+#          value: |
+#            fastscore:
+#              fleet:
+#                - api: model-manage
+#                  host: model-manage
+#                  port: 8002
+#                - api: engine
+#                  host: engine-1
+#                  port: 8003
+#                  name: engine-1
+#                - api: engine
+#                  host: engine-2
+#                  port: 8003
+#                  name: engine-2
+#                - api: engine
+#                  host: engine-3
+#                  port: 8003
+#                  name: engine-3
+#
+#              db:
+#                type: git
+#                url: ${GIT_URL}
+#                branch: ${GIT_BRANCH}
+#                username: secret://git-username
+#                password: secret://git-password
+#
+#              pneumo:
+#                type: REST
         ports:
         - containerPort: 8001
           protocol: TCP
@@ -77,8 +82,11 @@ spec:
         stdin: true
         tty: true
       volumes:
-      - emptyDir: {}
-        name: log-dir
+      - name: fastscore-configmap-volume
+        configMap:
+          name: fastscore-configmap
+      - name: log-dir
+        emptyDir: {}
       restartPolicy: Always
 status: {}
 ---
