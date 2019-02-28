@@ -9,22 +9,8 @@ In order to use this repo, it is assumed that you have already:
 * Installed the `htpasswd` utility on whatever host/container you're using to run the Makefile
  * Typically this is found in the `httpd-tools` package of your favorite package manager
  * It's only used to add/modify the usernames/passwords to access the Fastscore environment
-
-## Project structure
-* Makefile - contains helper code to assist with initial configuration/installation into a kubernetes cluster (should be fairly self-describing)
-* templates/ - contains source files for manifests and some configs
- * templates/config/ contains any configs that need to be parameterized (parameters are searched through when running `make parameters`)
- * templates/manifests/ - contains source files for manifests that need to be parameterized (again, parameters are searched with `make parameters`)
-* config/ - after running `make environment`, contains all config files that are intended to be build into configMap kubernetes objects (done in Makefile)
- * airflow_config/ contains an example DAG and processing script
-* manifests/ - after running `make environment`, contains all k8s manifest files describing deployments and services (both k8s objects) that make up the Fastscore fleet
- * fastscore-core.yaml defines deployments and services for the main supporting Fastscore services
- * fastscore-engines.yaml defines three deployments/services for `fastscore/engine` containers (used to run models)
-  * Feel free to modify these to fit your requirements
- * fastscore-disk.yaml contains a definition of two persistentVolumeClaims which are used to persist metadata in viz and scheduler
- * fastscore-aux.yaml contains a couple of helper services that are occasionally used in demonstration/PoC environments
-  * A MySQL-based database which can be used to back model-manage if Git is unavailable
-  * A single-host Kafka service
+* Installed the `envsubst` utility on whatever host/container you're using to run the Makefile
+ * Typically this is found in the `gettext-base` package of your favorite package manager
 
 ## Quick Start
 * Run `make parameters`
@@ -52,6 +38,22 @@ Once that DNS has been created, you can connect with your fastscore CLI like thi
 * viz will be accessible at: https://<Loadbalancer_DNS_or_IP>/viz
 * scheduler will be accessible at: https://<Loadbalancer_DNS_or_IP>/scheduler
  * Technically, this will redirect to https://<Loadbalancer_DNS_or_IP>/scheduler/admin/
+
+## Project structure
+* Makefile - contains helper code to assist with initial configuration/installation into a kubernetes cluster (should be fairly self-describing)
+* templates/ - contains source files for manifests and some configs
+ * templates/config/ contains any configs that need to be parameterized (parameters are searched through when running `make parameters`)
+ * templates/manifests/ - contains source files for manifests that need to be parameterized (again, parameters are searched with `make parameters`)
+* config/ - after running `make environment`, contains all config files that are intended to be build into configMap kubernetes objects (done in Makefile)
+ * airflow_config/ contains an example DAG and processing script
+* manifests/ - after running `make environment`, contains all k8s manifest files describing deployments and services (both k8s objects) that make up the Fastscore fleet
+ * fastscore-core.yaml defines deployments and services for the main supporting Fastscore services
+ * fastscore-engines.yaml defines three deployments/services for `fastscore/engine` containers (used to run models)
+  * Feel free to modify these to fit your requirements
+ * fastscore-disk.yaml contains a definition of two persistentVolumeClaims which are used to persist metadata in viz and scheduler
+ * fastscore-aux.yaml contains a couple of helper services that are occasionally used in demonstration/PoC environments
+  * A MySQL-based database which can be used to back model-manage if Git is unavailable
+  * A single-host Kafka service
 
 ## On Templates and Manifests
 
