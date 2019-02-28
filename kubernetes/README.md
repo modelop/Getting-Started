@@ -4,32 +4,32 @@ This section of the repo contains files that help with installing a basic Fastsc
 
 ## Prerequisites
 In order to use this repo, it is assumed that you have already:
-1. Installed and configured a Kubernetes cluster
-2. Installed and configured `kubectl` command-line tool to talk to the appropriate kubernetes cluster
-3. Installed the `htpasswd` utility on whatever host/container you're using to run the Makefile
+* Installed and configured a Kubernetes cluster
+* Installed and configured `kubectl` command-line tool to talk to the appropriate kubernetes cluster
+* Installed the `htpasswd` utility on whatever host/container you're using to run the Makefile
   * Typically this is found in the `httpd-tools` package of your favorite package manager
     * It's only used to add/modify the usernames/passwords to access the Fastscore environment
-4. Installed the `envsubst` utility on whatever host/container you're using to run the Makefile
+* Installed the `envsubst` utility on whatever host/container you're using to run the Makefile
   * Typically this is found in the `gettext-base` package of your favorite package manager
 
 ## Quick Start
-1. Run `make parameters`
-2. Edit the `env-parameters.txt` and `config-parameters.txt` files that were produced by `make parameters` to include appropriate values for your environment
+* Run `make parameters`
+* Edit the `env-parameters.txt` and `config-parameters.txt` files that were produced by `make parameters` to include appropriate values for your environment
   * Examples of parameters to edit include:
   * The Git repo URL and branch, as well as username/password for the Git repo you want to use to back your model assets
   * The name of the underlying kubernetes storageClass against which you want to provision your persistentVolumeClaims
-3. Run `make environment`
-4. Edit `config/cli_usernames` to include usernames you'd wish to allow access to the Fastscore fleet
-5. Run `make cli-passwords` To create secrets for CLI access; you will be prompted to enter a password for each user specified in `config/cli_usernames`
-6. Run `make deploy`
+* Run `make environment`
+* Edit `config/cli_usernames` to include usernames you'd wish to allow access to the Fastscore fleet
+* Run `make cli-passwords` To create secrets for CLI access; you will be prompted to enter a password for each user specified in `config/cli_usernames`
+* Run `make deploy`
 
 At this point, your kubernetes system will likely be auto-creating a Loadbalancer for a few minutes. You can find the URL you'll need to hit by typing:
 * `kubectl get svc/access`
 
 Once that DNS has been created, you can connect with your fastscore CLI like this:
 
-1. `fastscore connect https://<Loadbalancer_DNS_or_IP>/dashboard
-2. `fastscore login basicauth`
+* `fastscore connect https://<Loadbalancer_DNS_or_IP>/dashboard
+* `fastscore login basicauth`
   * Then follow the prompts for username/password
     * You should have just created these values in the Quick Start
 
