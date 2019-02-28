@@ -5,11 +5,9 @@
 #     |_|  \__,_|___/\__| |____/ \___\___/|_|  \___|
 #
 #  **NOTE**: In order to run commands in this Makefile, the following possibly non-standard utilities must be installed on the system 
-#  	* `kubectl` - kubernetes command-line interface (https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-#  	* `htpasswd` - Apache secure password file generator (typically found in apache2-utils package)
-#
-#  **NOTE**: secrets.yaml must be modified before running make secrets
-#  	* `kubectl get secrets` to see what secrets exist in your environment
+#  	* `kubectl` - kubernetes command-line interface (`https://kubernetes.io/docs/tasks/tools/install-kubectl/`)
+#  	* `htpasswd` - Apache secure password file generator (typically found in `apache2-utils` package)
+#  	* `envsubst` - Tool used to find/replace parameters in files in `template/` directory (typically found in `gettest-base` package)
 #
 #  **NOTE**: If fastscore CLI passwords must be created, config/cli_usernames must be populated with a list of users who need individual access
 #  	* First, make sure the config/cli_usernames file contains a list (one per line) of usernames for which passwords should be generated
@@ -21,7 +19,7 @@
 #  Stack Deployment  #
 ######################
 
-.PHONY: deploy config clean configmap cleanupconfigmap secrets cleanupsecrets 
+.PHONY: deploy config clean configmap cleanupconfigmap secrets cleanupsecrets cli-passwords parameters environment
 
 deploy: secrets configmap stack
 
