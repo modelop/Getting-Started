@@ -16,7 +16,7 @@ In order to use this repo, it is assumed that you have already:
 * Edit the created parameter file to include requisite information
   * e.g. GIT credentials, hostname, IP address associated with the environment, etc.
   * Parameters should be self-explanatory
-  * If you want to add users/modify passwords for CLI access, you can fill in the ${ENV_CLI_USERNAMES_COMMA_SEPARATED} line in `env-parameters.txt` with a comma-separated list of users
+  * If you want to add users/modify passwords for CLI access, you can fill in the `${ENV_CLI_USERNAMES_COMMA_SEPARATED}` line in `env-parameters.txt` with a comma-separated list of users (or edit `templates/config/cli_usernames` yourself)
     * If you don't want/need to update/modify the CLI passwords, just delete the line before running `make environment` and the system will continue using the default user/password for CLI access
 * **OPTIONAL** - If you want to update CLI username/passwords: `make cli-passwords`
   * This will prompt you to enter a password for each username you entered in the previous step

@@ -26,7 +26,7 @@ parameters_file=./env-parameters.txt
 deploy: secrets configmap stack
 
 stack:
-	kubectl apply -f manifests/
+	kubectl apply -f ./implementation/manifests/
 
 clean: cleanupconfigmap cleanupsecrets
 	kubectl delete all -l stack=fastscore
