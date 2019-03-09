@@ -9,7 +9,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: ${STORAGECLASS_NAME}
+  storageClassName: ${ENV_STORAGECLASS_NAME}
   resources:
     requests:
       storage: 1Gi
@@ -23,7 +23,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: ${STORAGECLASS_NAME}
+  storageClassName: ${ENV_STORAGECLASS_NAME}
   resources:
     requests:
       storage: 1Gi
@@ -37,7 +37,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: ${STORAGECLASS_NAME}
+  storageClassName: ${ENV_STORAGECLASS_NAME}
   resources:
     requests:
       storage: 1Gi

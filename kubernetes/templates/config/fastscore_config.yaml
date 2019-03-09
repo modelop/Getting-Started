@@ -18,8 +18,8 @@ fastscore:
 
       db:
         type: git
-        url: ${GIT_URL}
-        branch: ${GIT_BRANCH}
+        url: ${ENV_GIT_URL}
+        branch: ${ENV_GIT_BRANCH}
         username: secret://git-username
         password: secret://git-password
 
