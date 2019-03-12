@@ -42,7 +42,7 @@ if [ "$1" = "translate" ]; then
 	# Define arrays containing the parameters and substitutions
 	# The extra `sed` in here just deletes any lines that start with a # character, to allow for comments in default parameters files
 	PARAMS=( $(cat $CONF | sed '/#.*/d' | cut -d '=' -f 1) )
-	VALUES=( $(cat $CONF | sed '/#.*/d' | cut -d '=' -f 2) )
+	VALUES=( $(cat $CONF | sed '/#.*/d' | cut -d '=' -f 2-) )
 
 	# Loop through the arrays, doing a recursive sed to find/replace every instance of the parameter in the project
 	for val in ${!PARAMS[@]}; do
