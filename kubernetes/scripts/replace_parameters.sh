@@ -37,7 +37,7 @@ if [ "$1" = "translate" ]; then
   fi
 
 	# Recursively copy the contents of the IN directory to the OUT directory
-	cp --recursive ${IN}/* $OUT
+	cp -R ${IN}/* $OUT
 
 	# Define arrays containing the parameters and substitutions
 	# The extra `sed` in here just deletes any lines that start with a # character, to allow for comments in default parameters files
