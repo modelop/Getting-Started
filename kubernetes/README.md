@@ -18,11 +18,11 @@ In order to use this repo, it is assumed that you have already:
   * Parameters should be self-explanatory
   * If you want to add users/modify passwords for CLI access, you can fill in the `${ENV_CLI_USERNAMES_COMMA_SEPARATED}` line in `env-parameters.txt` with a comma-separated list of users (or edit `templates/config/cli_usernames` yourself)
     * If you don't want/need to update/modify the CLI passwords, just delete the line before running `make environment` and the system will continue using the default user/password for CLI access
+* `make environment`
+  * This takes the values you filled in during the previous step, and creates new copies of the templated files under the `implementation/` directory
 * **OPTIONAL** - If you want to update CLI username/passwords: `make cli-passwords`
   * This will prompt you to enter a password for each username you entered in the previous step
   * This creates a hashed and salted password file, which is used to create a kubernetes configMap which is used by the Access service
-* `make environment`
-  * This takes the values you filled in during the previous step, and creates new copies of the templated files under the `implementaiton/` directory
 * `make deploy`
   * This will create the required kubernetes resources, deploying the environment
 

@@ -53,4 +53,5 @@ parameters:
 	@bash -c "./scripts/replace_parameters.sh discover ./templates/  > env-parameters.txt"
 
 environment:
+	@mkdir -p ./implementation/
 	@bash -c "./scripts/replace_parameters.sh translate ${parameters_file} ./templates/ ./implementation/"
