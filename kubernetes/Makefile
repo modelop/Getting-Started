@@ -32,19 +32,19 @@ clean: cleanupconfigmap cleanupsecrets
 	kubectl delete all -l stack=fastscore
 
 configmap: cleanupconfigmap
-	kubectl create configmap cli-passwd --from-file=./implementation/config/cli_passwd || echo "done"
 	kubectl create configmap airflow-dags-configmap --from-file=./implementation/config/airflow_config/dags || echo "done"
 	kubectl create configmap airflow-processing-configmap --from-file=./implementation/config/airflow_config/processing || echo "done"
 	kubectl create configmap fastscore-configmap --from-file=./implementation/config/fastscore_config.yaml || echo "done"
 
 cleanupconfigmap:
-	kubectl delete configmap cli-passwd || echo "done"
 	kubectl delete configmap airflow-dags-configmap || echo "done"
 	kubectl delete configmap airflow-processing-configmap || echo "done"
 	kubectl delete configmap fastscore-configmap || echo "done"
 
 cli-passwords:
+	kubectl delete configmap cli-passwd || echo "done"
 	@touch ./implementation/config/cli_passwd && for name in $$(cat ./implementation/config/cli_usernames | sed 's/,/\n/g'); do echo "Enter password for user $$name"; htpasswd ./implementation/config/cli_passwd $$name ; done
+	kubectl create configmap cli-passwd --from-file=./implementation/config/cli_passwd || echo "done"
 
 cleanupsecrets:
 	kubectl delete secrets --all
