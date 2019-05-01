@@ -23,5 +23,11 @@ fastscore:
     username: secret://git-username
     password: secret://git-password
 
+#  pneumo:
+#    type: REST
+
   pneumo:
-    type: REST
+    type: kafka
+    bootstrap:
+      - kafka:9092
+    topic: notify
