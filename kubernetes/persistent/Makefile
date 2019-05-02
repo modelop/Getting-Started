@@ -28,7 +28,7 @@ deploy: secrets configmap stack
 stack:
 	kubectl apply -f ./implementation/manifests/
 
-clean: cleanupconfigmap cleanupsecrets
+clean: cleanupconfigmap 
 	kubectl delete all -l stack=fastscore
 
 configmap: cleanupconfigmap

@@ -400,6 +400,8 @@ spec:
           name: bin-dir 
         - mountPath: /usr/local/airflow/logs
           name: log-dir 
+        - mountPath: /usr/local/airflow/persistent
+          name: scheduler-metadata-db
         resources: {}
         stdin: true
         tty: true
@@ -414,6 +416,8 @@ spec:
         name: proc-dir
       - emptyDir: {}
         name: log-dir
+      - emptyDir: {}
+        name: scheduler-metadata-db
       - name: airflow-dags-configmap-volume
         configMap:
           name: airflow-dags-configmap
