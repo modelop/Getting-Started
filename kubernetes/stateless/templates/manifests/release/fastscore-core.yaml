@@ -28,7 +28,6 @@ spec:
   replicas: 1
   template:
     metadata:
-      annotations:
       labels:
         service: connect
         app: connect
@@ -123,7 +122,6 @@ spec:
   replicas: 1
   template:
     metadata:
-      annotations:
       labels:
         service: dashboard
         app: dashboard
@@ -180,7 +178,6 @@ spec:
   replicas: 1
   template:
     metadata:
-      annotations:
       labels:
         service: model-manage
         app: model-manage
@@ -253,7 +250,6 @@ spec:
   replicas: 1
   template:
     metadata:
-      annotations:
       labels:
         service: access
         app: access
@@ -268,8 +264,6 @@ spec:
 # They are set here to the default values, and commented to show they are not strictly necessary
 #        - name: FASTSCORE_PROXY
 #          value: https://dashboard:8000
-#        - name: FASTSCORE_LINEAGEDB
-#          value: http://lineagedb:8529
 #        - name: FASTSCORE_VIZ
 #          value: http://viz:3000
 #        - name: FASTSCORE_SCHEDULER
@@ -358,7 +352,6 @@ spec:
   replicas: 1
   template:
     metadata:
-      annotations:
       labels:
         service: scheduler
         app: scheduler
@@ -468,7 +461,6 @@ spec:
   replicas: 1
   template:
     metadata:
-      annotations:
       labels:
         service: viz
         app: viz
