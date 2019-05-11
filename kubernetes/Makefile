@@ -22,7 +22,23 @@ parameters_file=./env-parameters.txt
 #Set $beta=true to deploy with beta features
 beta=false
 # Set $deployment_type=persistent to enable use of persistentVolumeClaims to keep DB data between runs
+persistent=false
+
+# Check to see if beta features or persistent operation is turned on
+ifeq ($(persistent),true)
+parameters: parameters-persistent
+deployment_type=persistent
+else
+parameters: parameters-stateless
 deployment_type=stateless
+endif
+
+#If you want to include beta features, change $make_beta_features to true
+ifeq ($(beta),true)
+stack: stack-beta
+else
+stack: stack-release
+endif
 
 .PHONY: clean configmap cleanupconfigmap cleanupsecrets cli-passwords dags deploy environment parameters stack
 
@@ -58,24 +74,11 @@ environment:
 	@mkdir -p ./implementation/
 	@bash -c "./scripts/replace_parameters.sh translate ${parameters_file} ./templates/ ./implementation/"
 
-ifeq ($(deployment_type),stateless)
-parameters: parameters-stateless
-else
-parameters: parameters-persistent
-endif
-
 parameters-persistent:
 	@bash -c "./scripts/replace_parameters.sh discover ./templates/  > env-parameters.txt"
 
 parameters-stateless: parameters-persistent
 	@sed -i '/.*STORAGECLASS.*/d' ./env-parameters.txt
-
-#If you want to include beta features, change $make_beta_features to true
-ifeq ($(beta),true)
-stack: stack-beta
-else
-stack: stack-release
-endif
 
 stack-beta: stack-release
 	kubectl apply -f ./implementation/manifests/beta/${deployment_type}
