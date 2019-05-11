@@ -30,9 +30,9 @@ clean: cleanupconfigmap
 	kubectl delete all -l stack=fastscore
 
 configmap: cleanupconfigmap
-	kubectl create configmap airflow-dags-configmap --from-file=${deployment_type}/implementation/config/airflow_config/dags || echo "done"
-	kubectl create configmap airflow-processing-configmap --from-file=${deployment_type}/implementation/config/airflow_config/processing || echo "done"
-	kubectl create configmap fastscore-configmap --from-file=${deployment_type}/implementation/config/fastscore_config.yaml || echo "done"
+	kubectl create configmap airflow-dags-configmap --from-file=./implementation/config/airflow_config/dags || echo "done"
+	kubectl create configmap airflow-processing-configmap --from-file=./implementation/config/airflow_config/processing || echo "done"
+	kubectl create configmap fastscore-configmap --from-file=./implementation/config/fastscore_config.yaml || echo "done"
 
 cleanupconfigmap:
 	kubectl delete configmap airflow-dags-configmap || echo "done"
@@ -44,8 +44,8 @@ cleanupsecrets:
 
 cli-passwords:
 	kubectl delete configmap cli-passwd || echo "done"
-	@touch ${deployment_type}/implementation/config/cli_passwd && for name in $$(cat ${deployment_type}/implementation/config/cli_usernames | sed 's/,/\n/g'); do echo "Enter password for user $$name"; htpasswd ${deployment_type}/implementation/config/cli_passwd $$name ; done
-	kubectl create configmap cli-passwd --from-file=${deployment_type}/implementation/config/cli_passwd || echo "done"
+	@touch ./implementation/config/cli_passwd && for name in $$(cat ./implementation/config/cli_usernames | sed 's/,/\n/g'); do echo "Enter password for user $$name"; htpasswd ./implementation/config/cli_passwd $$name ; done
+	kubectl create configmap cli-passwd --from-file=./implementation/config/cli_passwd || echo "done"
 
 dags: configmap
 	kubectl delete pod $$(kubectl get pods -l app=scheduler | awk '/scheduler/ {print $$1}')
@@ -53,11 +53,20 @@ dags: configmap
 deploy: environment configmap stack
 
 environment:
-	@mkdir -p ${deployment_type}/implementation/
-	@bash -c "${deployment_type}/scripts/replace_parameters.sh translate ${parameters_file} ${deployment_type}/templates/ ${deployment_type}/implementation/"
+	@mkdir -p ./implementation/
+	@bash -c "./scripts/replace_parameters.sh translate ${parameters_file} ./templates/ ./implementation/"
 
-parameters:
-	@bash -c "${deployment_type}/scripts/replace_parameters.sh discover ${deployment_type}/templates/  > env-parameters.txt"
+ifeq ($(deployment_type),stateless)
+parameters: parameters-stateless
+else
+parameters: parameters-persistent
+endif
+
+parameters-persistent:
+	@bash -c "./scripts/replace_parameters.sh discover ./templates/  > env-parameters.txt"
+
+parameters-stateless: parameters-persistent
+	@sed -i '/.*STORAGECLASS.*/d' ./env-parameters.txt
 
 #If you want to include beta features, change $make_beta_features to true
 ifeq ($(beta),true)
@@ -66,10 +75,9 @@ else
 stack: stack-release
 endif
 
-stack-beta:
-	kubectl apply -f ${deployment_type}/implementation/manifests/release/
-	kubectl apply -f ${deployment_type}/implementation/manifests/beta/
+stack-beta: stack-release
+	kubectl apply -f ./implementation/manifests/beta/${deployment_type}
 
 stack-release:
-	kubectl apply -f ${deployment_type}/implementation/manifests/release/
-
+	kubectl apply -f ./implementation/manifests/release/common/
+	kubectl apply -f ./implementation/manifests/release/${deployment_type}

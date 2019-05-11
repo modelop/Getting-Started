@@ -111,7 +111,7 @@ ${GIT_USERNAME}=secret_git_username
 ${GIT_PASSWORD}=secret_git_password
 ```
 
-Then when you execute `make environment` the invoked script will read that `env-parameters.txt` file and replace the values on the left of the `=` with the values on the right, and write new files with the same names as those in the `templates/` directory into the `implementation/` directory. At that point, files in `implementation/` will be completed, and you only need to `make deploy` and/or use `kubectl` to do what you like with them.
+Then when you execute `make environment` (which is automatically invoked by `make deploy`) the invoked script will read that `env-parameters.txt` file and replace the values on the left of the `=` with the values on the right, and write new files with the same names as those in the `templates/` directory into the `implementation/` directory. At that point, files in `implementation/` will be completed, and you only need to `make deploy` and/or use `kubectl` to do what you like with them.
 
 **NOTE**: `make environment` takes a paremeter file as an argument. It may be helpful to create a `default-parameters.txt` file to save environment-specific (non-credential) information and commit that to a branch associated with a particular environment. e.g:
 ```
