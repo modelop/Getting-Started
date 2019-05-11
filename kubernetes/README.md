@@ -61,7 +61,6 @@ Initially in `templates/`, but copied into `implementation/`, the structure of s
 * `config/` - contains config files that are intended to be build into configMap kubernetes objects (done in Makefile)
   * `airflow_config/` contains files used to create Airflow scheduling DAGs, and scripts associated with those DAGs
 * `manifests/release/` - contains manifest files (in .yaml format) which define necessary kubernetes objects:
-  * namespaces
   * deployments
   * services
   * persistentVolumeClaims (if using the persistent deployment type)
