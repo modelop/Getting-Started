@@ -150,3 +150,76 @@ spec:
   type: ClusterIP
 status:
   loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: influx
+    app: influx
+    stack: fastscore
+  name: influx
+spec:
+  ports:
+  - name: 8083-tcp
+    port: 8083
+    protocol: TCP
+    targetPort: 8083
+  - name: 8086-tcp
+    port: 8086
+    protocol: TCP
+    targetPort: 8086
+  - name: 8090-tcp
+    port: 8090
+    protocol: TCP
+    targetPort: 8090
+  selector:
+    service: influx
+    app: influx
+    stack: fastscore
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: influx
+  labels:
+    service: influx
+    app: influx
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: influx
+        app: influx
+        stack: fastscore
+    spec:
+      containers:
+      - name: influx
+        image: fastscore/influx:1.9
+        env:
+        - name: INFLUXDB_DATA_ENGINE
+          value: "tsm1"
+        ports:
+        - containerPort: 8083
+          protocol: TCP
+        - containerPort: 8086
+          protocol: TCP
+        - containerPort: 8090
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /var/lib/influxdb
+          name: influx-data-dir
+        resources: {}
+        stdin: true
+        tty: true
+      volumes:
+      - name: influx-data-dir
+        emptyDir: {}
+      restartPolicy: Always
+status: {}
