@@ -34,6 +34,7 @@ configmap: cleanupconfigmap
 	kubectl create configmap airflow-dags-configmap --from-file=./implementation/config/airflow_config/dags || echo "done"
 	kubectl create configmap airflow-processing-configmap --from-file=./implementation/config/airflow_config/processing || echo "done"
 	kubectl create configmap fastscore-configmap --from-file=./implementation/config/fastscore_config.yaml || echo "done"
+	kubectl create configmap cli-passwd --from-file=./implementation/config/cli_passwd || echo "done"
 
 cleanupconfigmap:
 	kubectl delete configmap airflow-dags-configmap || echo "done"
