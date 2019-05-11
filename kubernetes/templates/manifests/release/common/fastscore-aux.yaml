@@ -4,6 +4,7 @@
 #
 # fastscore/model-manage-mysql (as 'database')
 # fastscore/kafka (as 'kafka')
+# fastscore/influx (as 'influx')
 #
 # NOTE: All directories mounted in the 'volumeMounts' sections of these deployments are
 # required for for services to run
