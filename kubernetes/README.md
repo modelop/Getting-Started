@@ -66,13 +66,6 @@ Initially in `templates/`, but copied into `implementation/`, the structure of s
   * services
   * persistentVolumeClaims (if using the persistent deployment type)
   * secrets
-  * `fastscore-core.yaml` defines deployments and services for the main supporting Fastscore services
-  * `fastscore-engines.yaml` defines three deployments/services for `fastscore/engine` containers (used to run models)
-    * Feel free to modify these to fit your requirements
-  * `fastscore-disk.yaml` contains a definition of two persistentVolumeClaims which are used to persist metadata in viz and scheduler
-  * `fastscore-aux.yaml` contains a couple of helper services that are occasionally used in demonstration/PoC environments
-    * A MySQL-based database which can be used to back model-manage if Git is unavailable
-    * A single-host Kafka service
 * `manifests/beta/` contains manifest files associated with beta functionality; enabled by setting `$beta=true` in the `Makefile`
 
 ## On Templates and Manifests
