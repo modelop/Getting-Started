@@ -28,6 +28,7 @@ deployment_type=stateless
 
 clean: cleanupconfigmap 
 	kubectl delete all -l stack=fastscore
+	rm -rf ./implementation/
 
 configmap: cleanupconfigmap
 	kubectl create configmap airflow-dags-configmap --from-file=./implementation/config/airflow_config/dags || echo "done"
