@@ -14,7 +14,7 @@ In order to use this repo, it is assumed that you have already:
 * Decide if you would like to use persistent or stateless operation for your installation
   * Persistent operation includes the use of `persistentVolumeClaim` objects, which require underlying `storageClass` objects to be provided. If you don't know what this means, we suggest using stateless (which is the default method)
 	* If using persistent operation, either edit the `Makefile` parameter `$persistent` to equal `true`, or invoke each `make` command using the appropriate variable override:
-    *e.g.: `make deploy persistent=true`
+      * e.g. `make deploy persistent=true`
 * `make parameters`
   * This will create a `env-parameters.txt` file containing every unique `${PARAMETER}` present in files under `templates/`
 * Edit the created parameter file to include requisite information
