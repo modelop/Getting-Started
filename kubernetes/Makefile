@@ -21,7 +21,7 @@
 parameters_file=./env-parameters.txt
 #Set $beta=true to deploy with beta features
 beta=false
-# Set $deployment_type=persistent to enable use of persistentVolumeClaims to keep DB data between runs
+# Set $persistent=true to enable use of persistentVolumeClaims to keep DB data between runs
 persistent=false
 
 # Check to see if beta features or persistent operation is turned on

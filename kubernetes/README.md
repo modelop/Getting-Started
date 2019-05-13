@@ -6,15 +6,15 @@ This section of the repo contains files that help with installing a stateful Fas
 In order to use this repo, it is assumed that you have already:
 * Installed and configured a Kubernetes cluster
 * Installed and configured `kubectl` command-line tool to talk to the appropriate kubernetes cluster
-* Installed the `htpasswd` utility on whatever host/container you're using to run the Makefile
+* *OPTIONAL* - Installed the `htpasswd` utility on whatever host/container you're using to run the Makefile
   * Typically this is found in the `httpd-tools` package of your favorite package manager
     * It's only used to add/modify the usernames/passwords to access the Fastscore environment
 
 ## Quick Start
 * Decide if you would like to use persistent or stateless operation for your installation
   * Persistent operation includes the use of `persistentVolumeClaim` objects, which require underlying `storageClass` objects to be provided. If you don't know what this means, we suggest using stateless (which is the default method)
-	* If using persistent operation, either edit the `Makefile` parameter `$deployment_type` to equal `persistent`, or invoke each `make` command using the appropriate variable override:
-    *e.g.: `make deploy deployment_type=persistent`
+	* If using persistent operation, either edit the `Makefile` parameter `$persistent` to equal `true`, or invoke each `make` command using the appropriate variable override:
+    *e.g.: `make deploy persistent=true`
 * `make parameters`
   * This will create a `env-parameters.txt` file containing every unique `${PARAMETER}` present in files under `templates/`
 * Edit the created parameter file to include requisite information
