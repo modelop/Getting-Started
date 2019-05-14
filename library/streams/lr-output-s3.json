@@ -1,0 +1,15 @@
+{
+  "Encoding": "JSON",  
+  "Rotate": {
+    "MaxSize": "5k"
+  },
+
+  "Transport": {
+    "Type": "S3",
+    "Bucket": "1-9-demo-1729937511",
+    "ObjectKey": "lr-predictions.jsons",
+    "AccessKeyID": "AKIAIVWQWLAZR3RD2KVQ",
+    "SecretAccessKey": "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",
+    "Region": "us-east-2"
+  }
+}
