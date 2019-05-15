@@ -156,10 +156,10 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    service: influx
-    app: influx
+    service: influxdb
+    app: influxdb
     stack: fastscore
-  name: influx
+  name: influxdb
 spec:
   ports:
   - name: 8083-tcp
@@ -175,8 +175,8 @@ spec:
     protocol: TCP
     targetPort: 8090
   selector:
-    service: influx
-    app: influx
+    service: influxdb
+    app: influxdb
     stack: fastscore
   sessionAffinity: None
   type: ClusterIP
@@ -186,22 +186,22 @@ status:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: influx
+  name: influxdb
   labels:
-    service: influx
-    app: influx
+    service: influxdb
+    app: influxdb
     stack: fastscore
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        service: influx
-        app: influx
+        service: influxdb
+        app: influxdb
         stack: fastscore
     spec:
       containers:
-      - name: influx
+      - name: influxdb
         image: fastscore/influx:1.9
         env:
         - name: INFLUXDB_DATA_ENGINE
@@ -215,12 +215,12 @@ spec:
           protocol: TCP
         volumeMounts:
         - mountPath: /var/lib/influxdb
-          name: influx-data-dir
+          name: influxdb-data-dir
         resources: {}
         stdin: true
         tty: true
       volumes:
-      - name: influx-data-dir
+      - name: influxdb-data-dir
         emptyDir: {}
       restartPolicy: Always
 status: {}
