@@ -22,5 +22,5 @@ done
 fastscore attachment upload fasttext-py3 library/attachments/my_lib.tar.gz
 fastscore attachment upload lr-1-py3 library/attachments/lr_pickle1.tar.gz
 fastscore attachment upload lr-2-py3 library/attachments/lr_pickle2.tar.gz
-fastscore attachment upload lr-1-monitored library/attachments/lr_pickle1.tar.gz
+fastscore attachment upload lr-1-monitored-py3 library/attachments/lr_pickle1.tar.gz
 fastscore attachment upload evaluator-py3 library/attachments/streamstats.tar.gz
