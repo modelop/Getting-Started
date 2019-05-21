@@ -20,7 +20,7 @@ slot0 = Slot(0)
 slot1 = Slot(1)
 ft_model = fastText.FastText.load_model('/fastscore/artifacts/fasttext_model.bin')
 tf_model = my_lib.create_model()
-tf_model.load_weights('/fastscore/artifacts/tf_example_checkpoint')
+tf_model.load_weights('/fastscore/artifacts/tf_example_checkpoint_small')
 data = []
 for s in slot0.read():
     data.append(s)    
