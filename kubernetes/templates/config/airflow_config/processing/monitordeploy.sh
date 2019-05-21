@@ -1,4 +1,4 @@
-fastscore connect https://dashboard:8000
+fastscore connect https://dashboard:8000/dashboard
 fastscore -wait fleet
 
 
