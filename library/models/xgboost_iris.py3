@@ -1,6 +1,6 @@
 #fastscore.action: unused
-#fastscore.schema.0: xgboost_input
-#fastscore.schema.1: xgboost_output
+#fastscore.schema.0: xgboost_iris_input
+#fastscore.schema.1: xgboost_iris_output
 #fastscore.module-attached: xgboost
 
 from fastscore.io import Slot
