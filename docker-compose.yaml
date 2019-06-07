@@ -20,7 +20,7 @@ services:
       - fsnet
 
   engine-1:
-    image: fastscore/engine:1.9
+    image: fastscore/engine:xgboost
     ports:
         - "8003:8003"
     volumes:
