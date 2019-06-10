@@ -13,6 +13,7 @@ It’s also useful (recommended but not mandatory) to have Docker Compose instal
 
 We will also need the FastScore CLI installed to interact with FastScore. 
 
-Download the CLI following 
+Download the CLI by following the instructions in this [guide](https://opendatagroup.github.io/Reference/FastScore%20CLI/).
+
 
 
