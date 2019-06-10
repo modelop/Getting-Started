@@ -13,6 +13,6 @@ It’s also useful (recommended but not mandatory) to have Docker Compose instal
 
 We will also need the FastScore CLI installed to interact with FastScore. 
 
-Download 
+Download the CLI following 
 
 

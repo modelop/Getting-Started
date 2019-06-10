@@ -11,7 +11,7 @@ services:
       - fsnet
 
   connect:
-    image: fastscore/connect:1.9
+    image: fastscore/connect:1.10
     ports:
         - "8001:8001"
     stdin_open: true
@@ -31,7 +31,7 @@ services:
       - fsnet
 
   engine-2:
-    image: fastscore/engine:1.9
+    image: fastscore/engine:1.10
     volumes:
       - ./data:/data
     environment:
@@ -47,7 +47,7 @@ services:
       - fsnet
 
   model-manage:
-    image: fastscore/model-manage:1.9 
+    image: fastscore/model-manage:1.10 
     depends_on:
       - connect
       - database

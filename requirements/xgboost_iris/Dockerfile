@@ -1,4 +1,4 @@
-FROM fastscore/engine:explicit-models
+FROM fastscore/engine:1.10
 ADD ./requirements.txt .
 
 RUN pip3 install --isolated --user -r requirements.txt
