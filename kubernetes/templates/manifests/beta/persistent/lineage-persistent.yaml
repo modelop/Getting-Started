@@ -29,7 +29,7 @@ spec:
         - name: USE_PNEUMO
           value: "yes"
         - name: CONNECT_PREFIX
-          value: http://connect:8001
+          value: connect:8001
         ports:
         - containerPort: 8008
           protocol: TCP
