@@ -31,7 +31,7 @@ services:
       - fsnet
 
   engine-2:
-    image: fastscore/engine:1.10
+    image: fastscore/engine:linearexample
     volumes:
       - ./data:/data
     environment:
