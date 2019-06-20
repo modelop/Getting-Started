@@ -12,7 +12,6 @@ import time
 slot0 = Slot(0)
 slot1 = Slot(1)
 for df in slot0:
-	time.sleep(150)
 	features = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
 	df = df[features]
 	model = pickle.load(open('xgboost_explicit.pkl', 'rb'))
