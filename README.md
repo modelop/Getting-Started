@@ -34,6 +34,7 @@ This guide was last updated for v1.10 of FastScore.</p>
   </li>
   <li><a href="#Deploy-as-REST">Deploy as REST</a></li>
   <li><a href="#Test-Model">Test Model</a></li>
+  <li><a href="#A-to-Z">Setup and Execution from A to Z</a></li>
 
 </ol>
 
@@ -519,6 +520,8 @@ fastscore model output -c</code>
 <p>This model takes some time to run. Once finished, we can see the output from our model as a list of probabilities, 
 each corresponding to a prediction on an input record.</p>
 <br>
+
+<h2 id="A-to-Z"><a name="A-to-Z"></a>Setup and Execution from A to Z</h2>
 
 <p>Here is the complete list of commands needed for setup, execution, and prediction:</p>
 
