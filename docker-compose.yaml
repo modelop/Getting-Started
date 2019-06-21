@@ -1,17 +1,44 @@
-version: '3.3'
+version: '3'
 services:
-  dashboard:
-    image: fastscore/dashboard:1.9
-    ports:
-        - "8000:8000"
+
+  engine-1:
+    image: localrepo/engine:elmo-example
+    stdin_open: true
+    tty: true
     environment:
-      CONNECT_PREFIX: https://connect:8001
-      BASE_PATH: ""
+        CONNECT_PREFIX: https://connect:8001
     networks:
       - fsnet
+    labels:
+      com.opendatagroup.fastscore.service: engine
+    volumes:
+      - ./data:/data
+
+  engine-2:
+    image: localrepo/engine:elmo-example
+    stdin_open: true
+    tty: true
+    environment:
+        CONNECT_PREFIX: https://connect:8001
+    networks:
+      - fsnet
+    labels:
+      com.opendatagroup.fastscore.service: engine
+    volumes:
+      - ./data:/data
+
+ dashboard:
+   image: fastscore/dashboard:1.10
+   ports:
+       - "8000:8000"
+   environment:
+     CONNECT_PREFIX: https://connect:8001
+     BASE_PATH: ""
+   networks:
+     - fsnet
 
   connect:
-    image: fastscore/connect:1.9
+    image: fastscore/connect:1.10
     ports:
         - "8001:8001"
     stdin_open: true
@@ -19,45 +46,33 @@ services:
     networks:
       - fsnet
 
-  engine-1:
-    image: fastscore/engine:1.9
-    ports:
-        - "8003:8003"
-    volumes:
-      - ./data:/data
-    environment:
-        CONNECT_PREFIX: https://connect:8001
-    networks:
-      - fsnet
-
-  engine-2:
-    image: fastscore/engine:1.9
-    volumes:
-      - ./data:/data
-    environment:
-        CONNECT_PREFIX: https://connect:8001
-    networks:
-      - fsnet
-
-  database:
-    image: fastscore/model-manage-mysql:1.9
+  mm-mysql:
+    image: fastscore/model-manage-mysql:1.10
     volumes:
       - db-data:/var/lib/mysql
     networks:
       - fsnet
 
   model-manage:
-    image: fastscore/model-manage:1.9 
-    depends_on:
-      - connect
-      - database
+    image: fastscore/model-manage:1.10
     environment:
       CONNECT_PREFIX: https://connect:8001
     networks:
       - fsnet
 
+#  model-deploy:
+#    image: fastscore/model-deploy:dev
+#    ports:
+#      - "8888:8888"
+#    volumes:
+#      - ./notebooks:/home/jovyan/work/demos
+#      - ./data:/home/jovyan/work/data
+#    networks:
+#      - fsnet
+#    command: start-notebook.sh --NotebookApp.token='fastscore'
+ 
   kafka:
-    image: fastscore/kafka:1.9
+    image: fastscore/kafka
     ports:
       - "9092:9092"
     networks:
