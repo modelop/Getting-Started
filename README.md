@@ -249,7 +249,7 @@ to Model Manage.</p>
 <p>With the FastScore CLI, we can infer the schema from a sample data record using the following command:</p>
 
 <p><code class="highlighter-rouge">fastscore schema infer &lt;data-file&gt;</code><br>
-<code class="highlighter-rouge">fastscore schema infer data/input_data.json --json</code></p>
+<code class="highlighter-rouge">fastscore schema infer data/ELMo_input_data.json --json</code></p>
 
 <p>This will return the following, which we save as <code class="highlighter-rouge">library/schemas/three-strings.avsc</code>:</p>
 <!-- HTML generated using hilite.me -->
@@ -294,7 +294,7 @@ to Model Manage.</p>
 
 <p>To test these schemas, we can verify them against the input data:</p>
 
-<p><code class="highlighter-rouge">fastscore schema verify --verbose three_strings data/input_data.json</code></p>
+<p><code class="highlighter-rouge">fastscore schema verify --verbose three_strings data/ELMo_input_data.json</code></p>
 
 <h3 id="3-model-execution-script"><a name="model-execution-script"></a>3. Model Execution Script</h3>
 <p>Next, we’re going to define the Model Execution Script, which will determine how the model predicts our output from the input data. 
@@ -506,13 +506,13 @@ Check the logs of the Engine to investigate the error messages:
 
 <h2 id="test-model"><a name="Test-Model"></a>Test Model</h2>
 <p>Finally, we’re going to send data to the model to test the Model Deployment Package entirely for prediction. 
-To send data contained in <code class="highlighter-rouge">input_data.json</code> 
+To send data contained in <code class="highlighter-rouge">ELMo_input_data.json</code> 
 via the CLI, and retrieve predictions, we use the following commands:</p>
 
 <div class="highlighter-rouge">
     <div class="highlight">
         <pre class="highlight">
-<code>cat data/input_data.json | fastscore model input
+<code>cat data/ELMo_input_data.json | fastscore model input
 fastscore model output -c</code>
 </pre></div></div>
 
@@ -546,7 +546,7 @@ fastscore engine reset
 fastscore run ELMo_nlp-py3 rest: rest:
 fastscore engine inspect
 
-cat data/input_data.json | fastscore model input
+cat data/ELMo_input_data.json | fastscore model input
 fastscore model output -c</code>
 </pre></div></div>          
 </body>
