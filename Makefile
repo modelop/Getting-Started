@@ -4,7 +4,7 @@ deploy: stop
 	docker swarm init
 	docker stack deploy -c docker-compose.yaml --resolve-image changed fs-vanilla
 	bash -x setup.sh
-	bash -x load.sh
+#	bash -x load.sh
 
 stop:
 	docker stack rm fs-vanilla && ([ $$? -eq 0 ] && echo "success!") || echo "failure!"
