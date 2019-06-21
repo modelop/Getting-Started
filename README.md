@@ -153,9 +153,9 @@ We finally deploy with <code class="highlighter-rouge">make</code> or <code clas
 <span style="color: #BA2121">RUN</span> pip3 install --upgrade xgboost
 
 <span style="color: #BA2121">USER</span> root
-<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">&quot;tensorflow&quot;</span>     &gt;&gt; /fastscore/lib/engine-1.9.1+build.859.refbb4afea/priv/runners/python3/python.stdlib
-<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">&quot;tensorflow_hub&quot;</span> &gt;&gt; /fastscore/lib/engine-1.9.1+build.859.refbb4afea/priv/runners/python3/python.stdlib
-<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">&quot;xgboost&quot;</span>        &gt;&gt; /fastscore/lib/engine-1.9.1+build.859.refbb4afea/priv/runners/python3/python.stdlib
+<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">&quot;tensorflow&quot;</span>     &gt;&gt; /fastscore/lib/`ls /fastscore/lib | grep engine`/priv/runners/python3/python.stdlib
+<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">&quot;tensorflow_hub&quot;</span> &gt;&gt; /fastscore/lib/`ls /fastscore/lib | grep engine`/priv/runners/python3/python.stdlib
+<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">&quot;xgboost&quot;</span>        &gt;&gt; /fastscore/lib/`ls /fastscore/lib | grep engine`/priv/runners/python3/python.stdlib
 </pre></div>
 <br>
 
