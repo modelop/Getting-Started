@@ -530,22 +530,16 @@ each corresponding to a prediction on an input record.</p>
 git checkout elmo-example
 
 docker build -t localrepo/engine:elmo-example .
-make deploy
-
+make deploy <br>
 fastscore schema add three_strings library/schemas/three-strings.avsc
 fastscore schema add double library/schemas/double.avsc
-
 fastscore model add ELMo_nlp-py3 library/models/ELMo_nlp.py3
-
 fastscore attachment upload ELMo_nlp-py3 library/attachments/ELMo_nlp_xgboost.tar.gz
-
 fastscore stream add rest library/streams/rest.json
-
 fastscore use engine-1
 fastscore engine reset
 fastscore run ELMo_nlp-py3 rest: rest:
 fastscore engine inspect
-
 cat data/ELMo_input_data.json | fastscore model input
 fastscore model output -c</code>
 </pre></div></div>          
