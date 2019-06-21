@@ -27,15 +27,15 @@ services:
     volumes:
       - ./data:/data
 
- dashboard:
-   image: fastscore/dashboard:1.10
-   ports:
-       - "8000:8000"
-   environment:
-     CONNECT_PREFIX: https://connect:8001
-     BASE_PATH: ""
-   networks:
-     - fsnet
+  dashboard:
+    image: fastscore/dashboard:1.10
+    ports:
+      - "8000:8000"
+    environment:
+      CONNECT_PREFIX: https://connect:8001
+      BASE_PATH: ""
+    networks:
+      - fsnet
 
   connect:
     image: fastscore/connect:1.10
