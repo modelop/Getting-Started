@@ -528,9 +528,8 @@ each corresponding to a prediction on an input record.</p>
 <code>git clone https://github.com/opendatagroup/Getting-Started.git
 <span class="nb">cd </span>Getting-Started
 git checkout elmo-example
-
 docker build -t localrepo/engine:elmo-example .
-make deploy <br>
+make deploy
 fastscore schema add three_strings library/schemas/three-strings.avsc
 fastscore schema add double library/schemas/double.avsc
 fastscore model add ELMo_nlp-py3 library/models/ELMo_nlp.py3
