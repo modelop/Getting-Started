@@ -519,7 +519,6 @@ fastscore model output -c</code>
 
 <p>This model takes some time to run. Once finished, we can see the output from our model as a list of probabilities, 
 each corresponding to a prediction on an input record.</p>
-<br>
 
 <h2 id="A-to-Z"><a name="A-to-Z"></a>Setup and Execution from A to Z</h2>
 
