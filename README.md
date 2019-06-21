@@ -519,5 +519,35 @@ fastscore model output -c</code>
 <p>This model takes some time to run. Once finished, we can see the output from our model as a list of probabilities, 
 each corresponding to a prediction on an input record.</p>
 <br>
+
+<p>Here is the complete list of commands needed for setup, execution, and prediction:</p>
+
+<div class="language-bash highlighter-rouge">
+    <div class="highlight">
+        <pre class="highlight">
+<code>git clone https://github.com/opendatagroup/Getting-Started.git
+<span class="nb">cd </span>Getting-Started
+git checkout elmo-example
+
+docker build -t localrepo/engine:elmo-example .
+make deploy
+
+fastscore schema add three_strings library/schemas/three-strings.avsc
+fastscore schema add double library/schemas/double.avsc
+
+fastscore model add ELMo_nlp-py3 library/models/ELMo_nlp.py3
+
+fastscore attachment upload ELMo_nlp-py3 library/attachments/ELMo_nlp_xgboost.tar.gz
+
+fastscore stream add rest library/streams/rest.json
+
+fastscore use engine-1
+fastscore engine reset
+fastscore run ELMo_nlp-py3 rest: rest:
+fastscore engine inspect
+
+cat data/input_data.json | fastscore model input
+fastscore model output -c</code>
+</pre></div></div>          
 </body>
 </html>
