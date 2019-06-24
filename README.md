@@ -18,6 +18,7 @@ This guide was last updated for v1.10 of FastScore.</p>
 <p>As we go, we will be referring to an example ELMo/XGBoost model available in the 
 <code class="highlighter-rouge">elmo-example</code> branch of 
 <a href="https://github.com/opendatagroup/Getting-Started/tree/examples">this repo</a>.</p>
+<p>Please refer to <a href="https://github.com/opendatagroup/Getting-Started/blob/elmo-example/notebooks/ELMo_nlp.ipynb">this jupyter notebook</a> for a detailed explanation of what the model does and how it is built.<p>
 
 <h1 id="contents">Contents</h1>
 
