@@ -20,7 +20,7 @@ slot0 = Slot(0)
 slot1 = Slot(1)
 
 input_data = slot0.read(format="pandas.standard")
-input_data = input_data.iloc[1:50]
+input_data = input_data.iloc[1:50] # remove the limit "50" to test model on all input data
 
 elmo = hub.Module("https://tfhub.dev/google/elmo/2", trainable=False)
 
