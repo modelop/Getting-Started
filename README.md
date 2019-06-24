@@ -443,7 +443,7 @@ Larger artifacts can be added to the Engine via the Dockerfile.</p>
 
 <p>In our example, we reference <code class="highlighter-rouge">ELMo_nlp_xgboost.pickle</code> 
 which is our trained model that we will use for predictions. FastScore will unpack the file in the working directory 
-so the model can utilize it. To add it to FastScore, we upload it the model and add it to Model Manage 
+so the model can utilize it. To add it to FastScore, we upload it to the model and add it to Model Manage 
 with the following CLI command:</p>
 
 <p><code class="highlighter-rouge">fastscore attachment upload &lt;model-name&gt; &lt;file-to-attach&gt;</code><br>
