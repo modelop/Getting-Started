@@ -48,6 +48,9 @@ services:
 
   model-deploy:
     image: fastscore/model-deploy:1.10
+    volumes:
+      - ./notebooks:/home/jovyan/work/demos
+      - ./data:/home/jovyan/work/data
     ports:
       - "8888:8888"
     networks:
