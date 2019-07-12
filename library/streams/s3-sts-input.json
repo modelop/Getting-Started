@@ -1,0 +1,12 @@
+{
+ "Encoding": "JSON",
+  "Transport": {
+    "AssumeRoleWithSAML": "role",
+    "Type": "S3",
+    "Bucket": "iris-data-bucket",
+    "ObjectKey": "xgboost_iris_inputs.jsons",
+    "AccessKeyID": "",
+    "SecretAccessKey": "",
+    "Region": "us-east-2"
+  }
+}

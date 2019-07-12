@@ -1,0 +1,10 @@
+{
+    "Version": "1.2",
+    "Envelope": "delimited",
+    "Loop": true,
+    "Transport": {
+        "Path": "/tmp/xgboost_iris_inputs.jsons",
+        "Type": "file"
+    },
+    "Encoding": "json"
+}
