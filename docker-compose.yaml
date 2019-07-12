@@ -21,7 +21,7 @@ services:
       - fsnet
 
   engine-1:
-    image: fastscore/engine:1.8
+    image: fastscore/engine:xgboost
     ports:
         - "8003:8003"
     volumes:
@@ -32,7 +32,7 @@ services:
       - fsnet
 
   engine-2:
-    image: fastscore/engine:1.10
+    image: fastscore/engine:dev-aws-temp-toks
     volumes:
       - ./data:/data
     environment:

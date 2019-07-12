@@ -12,7 +12,7 @@ def begin():
     global window, window_size
     window = []
     window_size = 15
-    with open('lr_pickle2.pkl', 'rb') as f:
+    with open('lr_pickle1.pkl', 'rb') as f:
         lr = pickle.load(f)
 
 def action(x):
@@ -22,9 +22,10 @@ def action(x):
     x = x['Close']
     window = window[1-window_size:] + [x]
     if len(window) < window_size:
-        yield {"name": "price", "value":x, "actual": actual}
+        yield {"name": "champion", "value":x, "actual": actual}
     else:
         X = np.array([window])
         y = lr.predict(X)
-        yield {"name":"price", "value": y[0,0], "actual": actual}
+        yield {"name":"champion", "value": y[0,0], "actual": actual}
+
 

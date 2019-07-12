@@ -4,6 +4,6 @@
     "fields":[
         {"type":"string", "name":"name"},
         {"type":"double", "name":"value"},
-        {"type":"double", "name":"MSE"}
+        {"type":"double", "name":"actual"}
     ]
 }

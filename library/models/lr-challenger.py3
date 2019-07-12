@@ -22,9 +22,9 @@ def action(x):
     x = x['Close']
     window = window[1-window_size:] + [x]
     if len(window) < window_size:
-        yield {"name": "price", "value":x, "actual": actual}
+        yield {"name": "challenger", "value":x, "actual": actual}
     else:
         X = np.array([window])
         y = lr.predict(X)
-        yield {"name":"price", "value": y[0,0], "actual": actual}
+        yield {"name":"challenger", "value": y[0,0], "actual": actual}
 

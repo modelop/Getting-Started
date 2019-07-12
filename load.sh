@@ -27,4 +27,4 @@ fastscore attachment upload evaluator-py3 library/attachments/streamstats.tar.gz
 fastscore attachment upload xgboost_iris-py3 library/attachments/xgboost_explicit.tar.gz
 fastscore attachment upload lr-champion-py3 library/attachments/lr_pickle1.tar.gz
 fastscore attachment upload lr-challenger-py3 library/attachments/lr_pickle2.tar.gz
-
+fastscore attachment upload xgboost_iris_backtest-py3 library/attachments/xgboost_explicit.tar.gz

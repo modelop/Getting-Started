@@ -1,4 +1,4 @@
-# fastscore.input: lr-mont
+# fastscore.input: tagged_mse
 # fastscore.module-attached: influxdb
 
 from influxdb import InfluxDBClient
@@ -12,7 +12,7 @@ def begin():
     FLUSH_DELTA = 0.05
     BATCH_SIZE = 10
     BATCH = []
-    influx = InfluxDBClient('influx', '8086', 'admin', 'scorefast', 'fastscore')
+    influx = InfluxDBClient('influxdb', '8086', 'admin', 'scorefast', 'fastscore')
 
 def gen_point(name, actual, prediction, MSE, timestamp):
     point = {
@@ -20,7 +20,7 @@ def gen_point(name, actual, prediction, MSE, timestamp):
         "time": timestamp,
         "fields": {
             "Predicted": prediction,
-            "Actual": actual,
+            "value": actual,
             "MSE": MSE,
             "timestamp": timestamp
         }
@@ -33,7 +33,7 @@ def action(datum):
     MSE = 0
     name = datum['name']
     actual = datum['actual']
-    predicted = datum['predicted']
+    predicted = datum['value']
     timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     MSE = (1/N)*(N*MSE+(predicted - actual) ** 2)
@@ -46,3 +46,4 @@ def action(datum):
         BATCH = []
         sleep(FLUSH_DELTA)
     yield {"name": "score", "predicted": predicted,"actual": actual, "MSE": MSE}
+
