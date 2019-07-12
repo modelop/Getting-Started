@@ -23,7 +23,7 @@ spec:
         env:
         - name: CONNECT_PREFIX
           value: https://connect:8001
-        image: fastscore/engine:fasttextexample
+        image: fastscore/engine:linearexample
         # Use the resources section to request to be deployed to a node with enough resources for your model (if necessary)
         resources:
           requests:
@@ -94,7 +94,7 @@ spec:
         env:
         - name: CONNECT_PREFIX
           value: https://connect:8001
-        image: fastscore/engine:linearexample
+        image: fastscore/engine:linears3
         # Use the resources section to request to be deployed to a node with enough resources for your model (if necessary)
         resources:
           requests:
@@ -165,7 +165,7 @@ spec:
         env:
         - name: CONNECT_PREFIX
           value: https://connect:8001
-        image: fastscore/engine:linearexample
+        image: fastscore/engine:xgboost
         # Use the resources section to request to be deployed to a node with enough resources for your model (if necessary)
         resources:
           requests:
