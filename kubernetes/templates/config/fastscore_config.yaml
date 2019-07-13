@@ -15,7 +15,18 @@ fastscore:
       host: engine-3
       port: 8003
       name: engine-3
-
+    - api: engine
+      host: engine-4
+      port: 8003
+      name: engine-4
+    - api: engine
+      host: engine-5
+      port: 8003
+      name: engine-5
+    - api: engine
+      host: engine-6
+      port: 8003
+      name: engine-6
   db:
     type: git
     url: ${ENV_GIT_URL}

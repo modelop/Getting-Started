@@ -94,7 +94,7 @@ spec:
         env:
         - name: CONNECT_PREFIX
           value: https://connect:8001
-        image: fastscore/engine:linears3
+        image: fastscore/engine:linearexample
         # Use the resources section to request to be deployed to a node with enough resources for your model (if necessary)
         resources:
           requests:
@@ -165,7 +165,7 @@ spec:
         env:
         - name: CONNECT_PREFIX
           value: https://connect:8001
-        image: fastscore/engine:xgboost
+        image: fastscore/engine:linearexample
         # Use the resources section to request to be deployed to a node with enough resources for your model (if necessary)
         resources:
           requests:
@@ -212,3 +212,218 @@ spec:
   type: ClusterIP
 status:
   loadBalancer: {}
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: engine-4
+  labels:
+    service: engine-4
+    app: engine-4
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: engine-4
+        app: engine-4
+        stack: fastscore
+    spec:
+      containers:
+      - name: engine-4
+        env:
+        - name: CONNECT_PREFIX
+          value: https://connect:8001
+        image: fastscore/engine:linearexample
+        # Use the resources section to request to be deployed to a node with enough resources for your model (if necessary)
+        resources:
+          requests:
+            cpu: 
+            memory:
+        volumeMounts:
+        #Fastscore engines write to the following directories during normal operation
+        - mountPath: /fastscore/log
+          name: log-dir
+        - mountPath: /tmp
+          name: temp-dir
+        ports:
+        - containerPort: 8003
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+      volumes:
+      - emptyDir: {}
+        name: log-dir
+      - emptyDir: {}
+        name: temp-dir
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: engine-4
+    app: engine-4
+    stack: fastscore
+  name: engine-4
+spec:
+  ports:
+  - name: 8003-tcp
+    port: 8003
+    protocol: TCP
+    targetPort: 8003
+  selector:
+    service: engine-4
+    app: engine-4
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: engine-5
+  labels:
+    service: engine-5
+    app: engine-5
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: engine-5
+        app: engine-5
+        stack: fastscore
+    spec:
+      containers:
+      - name: engine-5
+        env:
+        - name: CONNECT_PREFIX
+          value: https://connect:8001
+        image: fastscore/engine:xgboost
+        # Use the resources section to request to be deployed to a node with enough resources for your model (if necessary)
+        resources:
+          requests:
+            cpu: 
+            memory:
+        volumeMounts:
+        #Fastscore engines write to the following directories during normal operation
+        - mountPath: /fastscore/log
+          name: log-dir
+        - mountPath: /tmp
+          name: temp-dir
+        ports:
+        - containerPort: 8003
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+      volumes:
+      - emptyDir: {}
+        name: log-dir
+      - emptyDir: {}
+        name: temp-dir
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: engine-5
+    app: engine-5
+    stack: fastscore
+  name: engine-5
+spec:
+  ports:
+  - name: 8003-tcp
+    port: 8003
+    protocol: TCP
+    targetPort: 8003
+  selector:
+    service: engine-5
+    app: engine-5
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: engine-6
+  labels:
+    service: engine-6
+    app: engine-6
+    stack: fastscore
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        service: engine-6
+        app: engine-6
+        stack: fastscore
+    spec:
+      containers:
+      - name: engine-6
+        env:
+        - name: CONNECT_PREFIX
+          value: https://connect:8001
+        image: fastscore/engine:linears3
+        # Use the resources section to request to be deployed to a node with enough resources for your model (if necessary)
+        resources:
+          requests:
+            cpu: 
+            memory:
+        volumeMounts:
+        #Fastscore engines write to the following directories during normal operation
+        - mountPath: /fastscore/log
+          name: log-dir
+        - mountPath: /tmp
+          name: temp-dir
+        ports:
+        - containerPort: 8003
+          protocol: TCP
+        resources: {}
+        stdin: true
+        tty: true
+      volumes:
+      - emptyDir: {}
+        name: log-dir
+      - emptyDir: {}
+        name: temp-dir
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: engine-6
+    app: engine-6
+    stack: fastscore
+  name: engine-6
+spec:
+  ports:
+  - name: 8003-tcp
+    port: 8003
+    protocol: TCP
+    targetPort: 8003
+  selector:
+    service: engine-6
+    app: engine-6
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---

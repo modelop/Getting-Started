@@ -32,7 +32,7 @@ services:
       - fsnet
 
   engine-2:
-    image: fastscore/engine:dev-aws-temp-toks
+    image: fastscore/engine:linearexample
     volumes:
       - ./data:/data
     environment:
