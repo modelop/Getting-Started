@@ -161,6 +161,8 @@ We finally deploy with <code class="highlighter-rouge">make</code> or <code clas
 </pre></div>
 <br>
 
+<!--
+
 <p>docker-compose.yaml</p><!-- HTML generated using http://highlight.hohli.com -->
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
 <pre class="yaml" style="font-family:monospace;"><span style="color: green;">version</span><span style="font-weight: bold; color: brown;">: </span>'3'<span style="color: #007F45;">
@@ -240,6 +242,8 @@ volumes</span>:<span style="color: #007F45;">
 </span><span style="color: #007F45;">
 networks</span><span style="font-weight: bold; color: brown;">:
 </span>  fsnet:</pre></div><br>
+
+-->
 
 <h3 id="2-defining-model-schema"><a name="model-schema"></a>2. Defining Model Schema</h3>
 <p>Next, we will define the Schemas for our input and output data. Schemata specify a “language-neutral type signature” for a model. 
