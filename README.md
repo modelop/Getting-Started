@@ -163,7 +163,7 @@ We finally deploy with <code class="highlighter-rouge">make</code> or <code clas
 
 <!--
 
-<p>docker-compose.yaml</p><!-- HTML generated using http://highlight.hohli.com -->
+<p>docker-compose.yaml</p>
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
 <pre class="yaml" style="font-family:monospace;"><span style="color: green;">version</span><span style="font-weight: bold; color: brown;">: </span>'3'<span style="color: #007F45;">
 services</span><span style="font-weight: bold; color: brown;">:
