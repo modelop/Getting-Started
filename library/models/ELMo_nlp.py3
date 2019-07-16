@@ -54,7 +54,7 @@ elmo_vecs = [elmo_vectors(x['comment_text']) for x in list_input_data]
 elmo_vecs = np.concatenate(elmo_vecs, axis = 0)
 
 # To score the ELMo embeddings, we first load a saved XGBoost model
-loaded_model = pickle.load(open("//shared_data/ELMo_nlp_xgboost.pickle","rb"))
+loaded_model = pickle.load(open("ELMO_nlp_xgboost.pickle","rb"))
 
 # We may now produce predictions
 predictions = loaded_model.predict(xgb.DMatrix(elmo_vecs))
