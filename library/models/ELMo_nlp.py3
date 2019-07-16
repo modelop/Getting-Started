@@ -16,13 +16,16 @@ import numpy as np
 import pandas as pd
 from math import floor
 
-slot0 = Slot(0)
-slot1 = Slot(1)
+slot0 = Slot(0)  # We will read input data from Slot(0)
+slot1 = Slot(1)  # and output predictions/scores to Slot(1)
 
+#  input_data will be a Pandas DataFrame
 input_data = slot0.read(format="pandas.standard")
+
 input_data = input_data.iloc[1:50] # remove the limit "50" to test model on all input data
 
-elmo = hub.Module("https://tfhub.dev/google/elmo/2", trainable=False)
+#  We load version 2 of the elmo module hosted on TensorFlow Hub
+elmo = hub.Module("https://tfhub.dev/google/elmo/2", trainable=True)
 
 def elmo_vectors(x):
     embeddings = elmo(x.tolist(), signature="default", as_dict=True)["elmo"]
@@ -32,17 +35,24 @@ def elmo_vectors(x):
         # return average of ELMo features
         return sess.run(tf.reduce_mean(embeddings,1))
 
-percent_samples = 1 # set to 1 to score all of input dataset       
+# Next, we batch input_data
+percent_samples = 1  # set to 1 to score all of input dataset       
 
-batch_size = 50
-    
-list_input_data = [input_data[i:i+batch_size] for i in range(0,floor(percent_samples*input_data.shape[0]),batch_size)]
+batch_size = 50  # batch_size may be changed depending on memory allocation
 
-# Extract ELMo embeddings
+lint_input_data = []
+
+for i in range(0, floor(percent_samples*input_data.shape[0]),batch_size):
+    list_input_data += input_data[i:i+batch_size]
+
+# Let us now extract ELMo embeddings
+
+globals().update(locals())
 elmo_vecs = [elmo_vectors(x['comment_text']) for x in list_input_data]
 
 elmo_vecs = np.concatenate(elmo_vecs, axis = 0)
 
+# To score the ELM0 embeddings, we first load a saved XGBoost model
 loaded_model = pickle.load(open("//shared_data/ELMo_nlp_xgboost.pickle","rb"))
 
 predictions = loaded_model.predict(xgb.DMatrix(elmo_vecs))
