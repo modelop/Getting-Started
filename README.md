@@ -10,21 +10,22 @@
 <body>
     <div class="pagecontent">
 <br>
-<h1 id="Conform-and-deploy-elmo-example">Conform and Deploy a Model: an ELMo Example</h1>
+<h1 id="Conform-and-deploy-elmo-example">Conform and Deploy a Model: an ELMo NLP Example</h1>
 <p>This is a step by step guide for conforming and deploying a model in FastScore. 
 It contains instructions for data scientists to prepare, deploy and test their model. 
 This guide was last updated for v1.10 of FastScore.</p>
 
 <p>As we go, we will be referring to an example ELMo/XGBoost model available in the 
 <code class="highlighter-rouge">elmo-example</code> branch of 
-<a href="https://github.com/opendatagroup/Getting-Started/tree/examples">this repo</a>.</p>
-<p>Please refer to <a href="https://github.com/opendatagroup/Getting-Started/blob/elmo-example/notebooks/ELMo_nlp.ipynb">this jupyter notebook</a> for a detailed explanation of what the model does and how it is built.<p>
+<a href="https://github.com/opendatagroup/Getting-Started/tree/examples">this repo</a>. 
+For a detailed walkthrough of the dataset and the model, please refer to 
+<a href="https://github.com/opendatagroup/Getting-Started/blob/elmo-example/notebooks/ELMo_nlp.ipynb"> this </a> Jupyter notebook. </p>
 
 <h1 id="contents">Contents</h1>
 
 <ol>
   <li><a href="#Prerequisites">Pre-requisites</a></li>
-  <li><a href="#model-deployment-package">Defining Deployment Package Overview</a>
+  <li><a href="#model-deployment-package">Model Deployment Package Overview</a>
     <ol>
       <li><a href="#model-dependencies">Model Dependencies</a></li>
       <li><a href="#model-schema">Model Schema</a></li>
@@ -35,7 +36,6 @@ This guide was last updated for v1.10 of FastScore.</p>
   </li>
   <li><a href="#Deploy-as-REST">Deploy as REST</a></li>
   <li><a href="#Test-Model">Test Model</a></li>
-  <li><a href="#A-to-Z">Setup and Execution from A to Z</a></li>
 
 </ol>
 
@@ -55,8 +55,7 @@ This guide was last updated for v1.10 of FastScore.</p>
 
 <div class="language-bash highlighter-rouge">
     <div class="highlight">
-        <pre class="highlight">
-<code>git clone https://github.com/opendatagroup/Getting-Started.git
+        <pre class="highlight"><code>git clone https://github.com/opendatagroup/Getting-Started.git
 <span class="nb">cd </span>Getting-Started
 git checkout elmo-example</code>
 </pre></div></div>
@@ -65,24 +64,21 @@ git checkout elmo-example</code>
 
 <div class="language-bash highlighter-rouge">
     <div class="highlight">
-        <pre class="highlight">
-<code>docker build -t localrepo/engine:elmo-example .
+        <pre class="highlight"><code>docker build -t localrepo/engine:elmo-example .
 make deploy</code>
 </pre></div></div>
 
-<p>To verify successful setup, run</p>
+<p>To verify successfull setup, run</p>
 <div class="language-bash highlighter-rouge">
     <div class="highlight">
-        <pre class="highlight">
-<code>fastscore fleet --wait</code>
+        <pre class="highlight"><code>fastscore fleet -wait</code>
 </pre></div></div>
 
 <p>You should expect the following output:</p>
 
 <div class="language-bash highlighter-rouge">
     <div class="highlight">
-        <pre class="highlight">
-<code>       NAME      |     API      |     HOST     | HEALTH
+        <pre class="highlight"><code>       NAME      |     API      |     HOST     | HEALTH
 -----------------+--------------+--------------+---------
   engine-2       | engine       | engine-2     | <span style="color: #2ECC71;">ok</span>
   engine-1       | engine       | engine-1     | <span style="color: #2ECC71;">ok</span>
@@ -132,6 +128,12 @@ the productionalization process without intensive input from the Data Scientist 
 As part of the deployment process, we will need to build the dependencies for our model on top of the base FastScore Engine container. 
 This is a key piece for the Data Scientist to hand off to the Model Operations team to ensure the model can run downstream.</p>
 
+
+<p> For our example, we will need the following python libraries: XGBoost, TensorFlow, and TensorFlow Hub. TensorFlow hub is used to load
+ the NLP module "ELMo", which uses TensorFlow to produce embeddings of text data. These embeddings (vectors) are then used as features 
+ in XGBoost, to train a Gradient Boost model.</p>
+ 
+<!--
 <p>For our example, we will need to build in the dependencies into the FastScore Engine. 
 The <code class="highlighter-rouge">elmo-example</code> branch’s docker-compose file points to the pre-built image on Dockerhub, 
 but here are the steps to manually add them for your model. The image is defined using the Dockerfile. 
@@ -139,13 +141,15 @@ To build the image in the local repo, we run <code class="highlighter-rouge">doc
 within the directory. Then, docker-compose.yaml points "engine-1" to utilize the new Engine. 
 We finally deploy with <code class="highlighter-rouge">make</code> or <code class="highlighter-rouge">make deploy</code>.</p>
 
+-->
+
+<!--
+
 <p>Here are the key components that define the image:</p>
 
 <p>Dockerfile</p>
-<!-- HTML generated using hilite.me -->
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
-    <pre style="margin: 0; line-height: 125%">
-<span style="color: #BA2121">FROM</span> fastscore/engine:ubuntu
+    <pre style="margin: 0; line-height: 125%"><span style="color: #BA2121">FROM</span> fastscore/engine:ubuntu
 <span style="color: #BA2121">WORKDIR</span> /fastscore
 
 <span style="color: #BA2121">RUN</span> pip3 install --upgrade pip
@@ -155,13 +159,16 @@ We finally deploy with <code class="highlighter-rouge">make</code> or <code clas
 <span style="color: #BA2121">RUN</span> pip3 install --upgrade xgboost
 
 <span style="color: #BA2121">USER</span> root
-<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">&quot;tensorflow&quot;</span>     &gt;&gt; /fastscore/lib/&#96;ls /fastscore/lib | grep engine&#96;/priv/runners/python3/python.stdlib
-<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">&quot;tensorflow_hub&quot;</span> &gt;&gt; /fastscore/lib/&#96;ls /fastscore/lib | grep engine&#96;/priv/runners/python3/python.stdlib
-<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">&quot;xgboost&quot;</span>        &gt;&gt; /fastscore/lib/&#96;ls /fastscore/lib | grep engine&#96;/priv/runners/python3/python.stdlib
+<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">"tensorflow"</span>     &gt;&gt; /fastscore/lib/engine-1.9.1+build.859.refbb4afea/priv/runners/python3/python.stdlib
+<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">"tensorflow_hub"</span> &gt;&gt; /fastscore/lib/engine-1.9.1+build.859.refbb4afea/priv/runners/python3/python.stdlib
+<span style="color: #BA2121">RUN</span> echo <span style="color: #0000FF">"xgboost"</span>        &gt;&gt; /fastscore/lib/engine-1.9.1+build.859.refbb4afea/priv/runners/python3/python.stdlib
 </pre></div>
 <br>
 
+-->
+
 <!--
+
 
 <p>docker-compose.yaml</p>
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
@@ -195,9 +202,9 @@ services</span><span style="font-weight: bold; color: brown;">:
 </span>      - ./data:/data
 <span style="color: #007F45;">
   proxy</span>:<span style="color: green;">
-    image</span><span style="font-weight: bold; color: brown;">: </span>fastscore/dashboard:1.10<span style="color: #007F45;">
+    image</span><span style="font-weight: bold; color: brown;">: </span>fastscore/frontman:dev<span style="color: #007F45;">
     ports</span><span style="font-weight: bold; color: brown;">:
-</span>        - <span style="color: #CF00CF;">&quot;8000:8000&quot;</span><span style="color: green;">
+</span>        - <span style="color: #CF00CF;">"8000:8000"</span><span style="color: green;">
     stdin_open</span><span style="font-weight: bold; color: brown;">: </span>true<span style="color: green;">
     tty</span><span style="font-weight: bold; color: brown;">: </span>true<span style="color: #007F45;">
     environment</span>:<span style="color: green;">
@@ -208,23 +215,23 @@ services</span><span style="font-weight: bold; color: brown;">:
         com.opendatagroup.fastscore.service</span><span style="font-weight: bold; color: brown;">: </span>proxy
 <span style="color: #007F45;">
   connect</span>:<span style="color: green;">
-    image</span><span style="font-weight: bold; color: brown;">: </span>fastscore/connect:1.10<span style="color: #007F45;">
+    image</span><span style="font-weight: bold; color: brown;">: </span>fastscore/connect:1.9<span style="color: #007F45;">
     ports</span><span style="font-weight: bold; color: brown;">:
-</span>        - <span style="color: #CF00CF;">&quot;8001:8001&quot;</span><span style="color: green;">
+</span>        - <span style="color: #CF00CF;">"8001:8001"</span><span style="color: green;">
     stdin_open</span><span style="font-weight: bold; color: brown;">: </span>true<span style="color: green;">
     tty</span><span style="font-weight: bold; color: brown;">: </span>true<span style="color: #007F45;">
     networks</span><span style="font-weight: bold; color: brown;">:
 </span>      - fsnet
 <span style="color: #007F45;">
   mm-mysql</span>:<span style="color: green;">
-    image</span><span style="font-weight: bold; color: brown;">: </span>fastscore/model-manage-mysql:1.10<span style="color: #007F45;">
+    image</span><span style="font-weight: bold; color: brown;">: </span>fastscore/model-manage-mysql:1.9<span style="color: #007F45;">
     volumes</span><span style="font-weight: bold; color: brown;">:
 </span>      - db-data:/var/lib/mysql<span style="color: #007F45;">
     networks</span><span style="font-weight: bold; color: brown;">:
 </span>      - fsnet
 <span style="color: #007F45;">
   model-manage</span>:<span style="color: green;">
-    image</span><span style="font-weight: bold; color: brown;">: </span>fastscore/model-manage:1.10<span style="color: #007F45;">
+    image</span><span style="font-weight: bold; color: brown;">: </span>fastscore/model-manage:1.9<span style="color: #007F45;">
     environment</span>:<span style="color: green;">
       CONNECT_PREFIX</span><span style="font-weight: bold; color: brown;">: </span>https://connect:8001<span style="color: #007F45;">
     networks</span><span style="font-weight: bold; color: brown;">:
@@ -233,7 +240,7 @@ services</span><span style="font-weight: bold; color: brown;">:
   kafka</span>:<span style="color: green;">
     image</span><span style="font-weight: bold; color: brown;">: </span>fastscore/kafka<span style="color: #007F45;">
     ports</span><span style="font-weight: bold; color: brown;">:
-</span>      - <span style="color: #CF00CF;">&quot;9092:9092&quot;</span><span style="color: #007F45;">
+</span>      - <span style="color: #CF00CF;">"9092:9092"</span><span style="color: #007F45;">
     networks</span><span style="font-weight: bold; color: brown;">:
 </span>      - fsnet
 <span style="color: #007F45;">
@@ -243,7 +250,9 @@ volumes</span>:<span style="color: #007F45;">
 networks</span><span style="font-weight: bold; color: brown;">:
 </span>  fsnet:</pre></div><br>
 
+
 -->
+
 
 <h3 id="2-defining-model-schema"><a name="model-schema"></a>2. Defining Model Schema</h3>
 <p>Next, we will define the Schemas for our input and output data. Schemata specify a “language-neutral type signature” for a model. 
@@ -255,31 +264,31 @@ to Model Manage.</p>
 <p>With the FastScore CLI, we can infer the schema from a sample data record using the following command:</p>
 
 <p><code class="highlighter-rouge">fastscore schema infer &lt;data-file&gt;</code><br>
-<code class="highlighter-rouge">fastscore schema infer data/ELMo_input_data.json --json</code></p>
+<code class="highlighter-rouge">fastscore schema infer data/input_data.json --json</code></p>
 
 <p>This will return the following, which we save as <code class="highlighter-rouge">library/schemas/three-strings.avsc</code>:</p>
 <!-- HTML generated using hilite.me -->
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
     <pre style="margin: 0; line-height: 125%">{
-    <span style="color: #008000; font-weight: bold">&quot;items&quot;</span>: {
-        <span style="color: #008000; font-weight: bold">&quot;fields&quot;</span>: [
+    <span style="color: #008000; font-weight: bold">"items"</span>: {
+        <span style="color: #008000; font-weight: bold">"fields"</span>: [
             {
-                <span style="color: #008000; font-weight: bold">&quot;name&quot;</span>: <span style="color: #BA2121">&quot;label&quot;</span>,
-                <span style="color: #008000; font-weight: bold">&quot;type&quot;</span>: <span style="color: #BA2121">&quot;string&quot;</span>
+                <span style="color: #008000; font-weight: bold">"name"</span>: <span style="color: #BA2121">"label"</span>,
+                <span style="color: #008000; font-weight: bold">"type"</span>: <span style="color: #BA2121">"string"</span>
             },
             {
-                <span style="color: #008000; font-weight: bold">&quot;name&quot;</span>: <span style="color: #BA2121">&quot;comment_text&quot;</span>,
-                <span style="color: #008000; font-weight: bold">&quot;type&quot;</span>: <span style="color: #BA2121">&quot;string&quot;</span>
+                <span style="color: #008000; font-weight: bold">"name"</span>: <span style="color: #BA2121">"comment_text"</span>,
+                <span style="color: #008000; font-weight: bold">"type"</span>: <span style="color: #BA2121">"string"</span>
             },
             {
-                <span style="color: #008000; font-weight: bold">&quot;name&quot;</span>: <span style="color: #BA2121">&quot;id&quot;</span>,
-                <span style="color: #008000; font-weight: bold">&quot;type&quot;</span>: <span style="color: #BA2121">&quot;string&quot;</span>
+                <span style="color: #008000; font-weight: bold">"name"</span>: <span style="color: #BA2121">"id"</span>,
+                <span style="color: #008000; font-weight: bold">"type"</span>: <span style="color: #BA2121">"string"</span>
             }
         ],
-        <span style="color: #008000; font-weight: bold">&quot;name&quot;</span>: <span style="color: #BA2121">&quot;recab2a72d7&quot;</span>,
-        <span style="color: #008000; font-weight: bold">&quot;type&quot;</span>: <span style="color: #BA2121">&quot;record&quot;</span>
+        <span style="color: #008000; font-weight: bold">"name"</span>: <span style="color: #BA2121">"recab2a72d7"</span>,
+        <span style="color: #008000; font-weight: bold">"type"</span>: <span style="color: #BA2121">"record"</span>
     },
-    <span style="color: #008000; font-weight: bold">&quot;type&quot;</span>: <span style="color: #BA2121">&quot;array&quot;</span>
+    <span style="color: #008000; font-weight: bold">"type"</span>: <span style="color: #BA2121">"array"</span>
 }
 </pre></div>
 <br>
@@ -287,7 +296,7 @@ to Model Manage.</p>
 <p>For the output schema, our model will output each prediction as a probability:</p>
 <!-- HTML generated using hilite.me -->
 <div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
-    <pre style="margin: 0; line-height: 125%">{<span style="color: #008000; font-weight: bold">&quot;type&quot;</span>:<span style="color: #BA2121">&quot;double&quot;</span>}
+    <pre style="margin: 0; line-height: 125%">{<span style="color: #008000; font-weight: bold">"type"</span>:<span style="color: #BA2121">"double"</span>}
 </pre></div>
 <br>
 
@@ -300,7 +309,7 @@ to Model Manage.</p>
 
 <p>To test these schemas, we can verify them against the input data:</p>
 
-<p><code class="highlighter-rouge">fastscore schema verify --verbose three_strings data/ELMo_input_data.json</code></p>
+<p><code class="highlighter-rouge">fastscore schema verify --verbose three_strings data/input_data.json</code></p>
 
 <h3 id="3-model-execution-script"><a name="model-execution-script"></a>3. Model Execution Script</h3>
 <p>Next, we’re going to define the Model Execution Script, which will determine how the model predicts our output from the input data. 
@@ -321,7 +330,7 @@ prior to introducing additional complexity of prediction.</p>
 <p>The prediction code is a snippet (Python3, in this case) that scores incoming data using a trained model. 
 Data coming in will be received from the input Stream to Slot(0). 
 A prediction can then be generated by a trained model which has been serialized as a binary file; in this example the trained model is 
-loaded as a pickle file <code class="highlighter-rouge">ELMo_nlp_xgboost.pickle</code>. The predictions are then written to the output slot, Slot(1), 
+loaded as a pickle file <code class="highlighter-rouge">ELMO_nlp_xgboost.pickle</code>. The predictions are then written to the output slot, Slot(1), 
 and the Stream attached there.</p>
 
 <p>FastScore includes both a Python2 and Python3 model runners. By default, <code class="highlighter-rouge">.py</code> 
@@ -331,62 +340,75 @@ files are interpreted as Python2 models; to load a Python3 model, use the file e
 </code></pre></div></div>
 
 <p>ELMo_nlp.py3</p>
-<!-- HTML generated using hilite.me -->
-<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
-    <pre style="margin: 0; line-height: 125%">
-<span style="color: #408080; font-style: italic">#fastscore.action: unused</span>
-<span style="color: #408080; font-style: italic">#fastscore.schema.0: three_strings</span>
-<span style="color: #408080; font-style: italic">#fastscore.schema.1: double</span>
-<span style="color: #408080; font-style: italic">#fastscore.recordsets.1: true</span>
-<span style="color: #408080; font-style: italic">#fastscore.module-attached: tensorflow</span>
-<span style="color: #408080; font-style: italic">#fastscore.module-attached: tensorflow_hub</span>
-<span style="color: #408080; font-style: italic">#fastscore.module-attached: xgboost</span>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #888888">#fastscore.action: unused</span>
+<span style="color: #888888">#fastscore.schema.0: three_strings</span>
+<span style="color: #888888">#fastscore.schema.1: double</span>
+<span style="color: #888888">#fastscore.recordsets.1: true</span>
+<span style="color: #888888">#fastscore.module-attached: tensorflow</span>
+<span style="color: #888888">#fastscore.module-attached: tensorflow_hub</span>
+<span style="color: #888888">#fastscore.module-attached: xgboost</span>
 
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">fastscore.io</span> <span style="color: #008000; font-weight: bold">import</span> Slot
+<span style="color: #008800; font-weight: bold">from</span> <span style="color: #0e84b5; font-weight: bold">fastscore.io</span> <span style="color: #008800; font-weight: bold">import</span> Slot
 
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">xgboost</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">xgb</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">pickle</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">tensorflow_hub</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">hub</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">tensorflow</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">tf</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">pandas</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">pd</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">math</span> <span style="color: #008000; font-weight: bold">import</span> floor
+<span style="color: #008800; font-weight: bold">import</span> <span style="color: #0e84b5; font-weight: bold">xgboost</span> <span style="color: #008800; font-weight: bold">as</span> <span style="color: #0e84b5; font-weight: bold">xgb</span>
+<span style="color: #008800; font-weight: bold">import</span> <span style="color: #0e84b5; font-weight: bold">pickle</span>
+<span style="color: #008800; font-weight: bold">import</span> <span style="color: #0e84b5; font-weight: bold">tensorflow_hub</span> <span style="color: #008800; font-weight: bold">as</span> <span style="color: #0e84b5; font-weight: bold">hub</span>
+<span style="color: #008800; font-weight: bold">import</span> <span style="color: #0e84b5; font-weight: bold">tensorflow</span> <span style="color: #008800; font-weight: bold">as</span> <span style="color: #0e84b5; font-weight: bold">tf</span>
+<span style="color: #008800; font-weight: bold">import</span> <span style="color: #0e84b5; font-weight: bold">numpy</span> <span style="color: #008800; font-weight: bold">as</span> <span style="color: #0e84b5; font-weight: bold">np</span>
+<span style="color: #008800; font-weight: bold">import</span> <span style="color: #0e84b5; font-weight: bold">pandas</span> <span style="color: #008800; font-weight: bold">as</span> <span style="color: #0e84b5; font-weight: bold">pd</span>
+<span style="color: #008800; font-weight: bold">from</span> <span style="color: #0e84b5; font-weight: bold">math</span> <span style="color: #008800; font-weight: bold">import</span> floor
 
-slot0 <span style="color: #666666">=</span> Slot(<span style="color: #666666">0</span>)
-slot1 <span style="color: #666666">=</span> Slot(<span style="color: #666666">1</span>)
+slot0 <span style="color: #333333">=</span> Slot(<span style="color: #0000DD; font-weight: bold">0</span>)  <span style="color: #888888"># Input data will be read from Slot(0)</span>
+slot1 <span style="color: #333333">=</span> Slot(<span style="color: #0000DD; font-weight: bold">1</span>)  <span style="color: #888888"># Predictions/scored will be pushed to Slot(1)</span>
 
-input_data <span style="color: #666666">=</span> slot0<span style="color: #666666">.</span>read(format<span style="color: #666666">=</span><span style="color: #BA2121">&quot;pandas.standard&quot;</span>)
-input_data <span style="color: #666666">=</span> input_data<span style="color: #666666">.</span>iloc[<span style="color: #666666">1</span>:]
+<span style="color: #888888"># input_data will be a Pandas DataFrame</span>
+input_data <span style="color: #333333">=</span> slot0<span style="color: #333333">.</span>read(<span style="color: #007020">format</span> <span style="color: #333333">=</span> <span style="background-color: #fff0f0">&quot;pandas.standard&quot;</span>)  
 
-elmo <span style="color: #666666">=</span> hub<span style="color: #666666">.</span>Module(<span style="color: #BA2121">&quot;https://tfhub.dev/google/elmo/2&quot;</span>, trainable<span style="color: #666666">=</span><span style="color: #008000">False</span>)
+percent_samples <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">1</span> <span style="color: #888888"># Set to 1 to score all of input dataset</span>
 
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">elmo_vectors</span>(x):
-    embeddings <span style="color: #666666">=</span> elmo(x<span style="color: #666666">.</span>tolist(), signature<span style="color: #666666">=</span><span style="color: #BA2121">&quot;default&quot;</span>, as_dict<span style="color: #666666">=</span><span style="color: #008000">True</span>)[<span style="color: #BA2121">&quot;elmo&quot;</span>]
-    <span style="color: #008000; font-weight: bold">with</span> tf<span style="color: #666666">.</span>Session() <span style="color: #008000; font-weight: bold">as</span> sess:
-        sess<span style="color: #666666">.</span>run(tf<span style="color: #666666">.</span>global_variables_initializer())
-        sess<span style="color: #666666">.</span>run(tf<span style="color: #666666">.</span>tables_initializer())
-        <span style="color: #408080; font-style: italic"># return average of ELMo features</span>
-        <span style="color: #008000; font-weight: bold">return</span> sess<span style="color: #666666">.</span>run(tf<span style="color: #666666">.</span>reduce_mean(embeddings,<span style="color: #666666">1</span>))
+batch_size <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">1</span>  <span style="color: #888888"># ELMo embeddings may be computed in batches. </span>
 
-percent_samples <span style="color: #666666">=</span> <span style="color: #666666">1</span> <span style="color: #408080; font-style: italic"># set to 1 to score all of input dataset       </span>
+list_input_data <span style="color: #333333">=</span> []
 
-batch_size <span style="color: #666666">=</span> <span style="color: #666666">50</span>
-    
-list_input_data <span style="color: #666666">=</span> [input_data[i:i<span style="color: #666666">+</span>batch_size] <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #666666">0</span>,floor(percent_samples<span style="color: #666666">*</span>input_data<span style="color: #666666">.</span>shape[<span style="color: #666666">0</span>]),batch_size)]
+<span style="color: #008800; font-weight: bold">for</span> i <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>, floor(percent_samples<span style="color: #333333">*</span>input_data<span style="color: #333333">.</span>shape[<span style="color: #0000DD; font-weight: bold">0</span>]), batch_size):
+    list_input_data <span style="color: #333333">+=</span> [input_data[i:i<span style="color: #333333">+</span>batch_size]]
 
-<span style="color: #408080; font-style: italic"># Extract ELMo embeddings</span>
-elmo_vecs <span style="color: #666666">=</span> [elmo_vectors(x[<span style="color: #BA2121">&#39;comment_text&#39;</span>]) <span style="color: #008000; font-weight: bold">for</span> x <span style="color: #AA22FF; font-weight: bold">in</span> list_input_data]
+<span style="color: #888888"># Loading the elmo module hosted on TensorFlow Hub</span>
+elmo <span style="color: #333333">=</span> hub<span style="color: #333333">.</span>Module(<span style="background-color: #fff0f0">&quot;https://tfhub.dev/google/elmo/2&quot;</span>, trainable<span style="color: #333333">=</span><span style="color: #008800; font-weight: bold">False</span>)
 
-elmo_vecs <span style="color: #666666">=</span> np<span style="color: #666666">.</span>concatenate(elmo_vecs, axis <span style="color: #666666">=</span> <span style="color: #666666">0</span>)
+<span style="color: #007020">globals</span>()<span style="color: #333333">.</span>update(<span style="color: #007020">locals</span>())
 
-loaded_model <span style="color: #666666">=</span> pickle<span style="color: #666666">.</span>load(<span style="color: #008000">open</span>(<span style="color: #BA2121">&quot;ELMo_nlp_xgboost.pickle&quot;</span>,<span style="color: #BA2121">&quot;rb&quot;</span>))
+<span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">elmo_vectors</span>(x):
+    <span style="color: #DD4422">&quot;&quot;&quot;A function to compute ELMo embeddings&quot;&quot;&quot;</span>
+    embeddings <span style="color: #333333">=</span> elmo(x<span style="color: #333333">.</span>tolist(), signature<span style="color: #333333">=</span><span style="background-color: #fff0f0">&quot;default&quot;</span>, as_dict<span style="color: #333333">=</span><span style="color: #008800; font-weight: bold">True</span>)[<span style="background-color: #fff0f0">&quot;elmo&quot;</span>]
+    <span style="color: #008800; font-weight: bold">with</span> tf<span style="color: #333333">.</span>compat<span style="color: #333333">.</span>v1<span style="color: #333333">.</span>Session() <span style="color: #008800; font-weight: bold">as</span> sess:
+        <span style="color: #888888"># sess.run(tf.global_variables_initializer())</span>
+        sess<span style="color: #333333">.</span>run(tf<span style="color: #333333">.</span>compat<span style="color: #333333">.</span>v1<span style="color: #333333">.</span>global_variables_initializer())
+        <span style="color: #888888"># sess.run(tf.tables_initializer())</span>
+        sess<span style="color: #333333">.</span>run(tf<span style="color: #333333">.</span>compat<span style="color: #333333">.</span>v1<span style="color: #333333">.</span>tables_initializer())
+        <span style="color: #888888"># return average of ELMo features</span>
+        <span style="color: #008800; font-weight: bold">return</span> sess<span style="color: #333333">.</span>run(tf<span style="color: #333333">.</span>reduce_mean(embeddings,<span style="color: #0000DD; font-weight: bold">1</span>))
 
-predictions <span style="color: #666666">=</span> loaded_model<span style="color: #666666">.</span>predict(xgb<span style="color: #666666">.</span>DMatrix(elmo_vecs))
+<span style="color: #888888"># Let us now extract ELMo embeddings of text data</span>
+<span style="color: #007020">globals</span>()<span style="color: #333333">.</span>update(<span style="color: #007020">locals</span>())
 
-out <span style="color: #666666">=</span> pd<span style="color: #666666">.</span>Series(predictions)
+elmo_vecs <span style="color: #333333">=</span> [elmo_vectors(x[<span style="background-color: #fff0f0">&#39;comment_text&#39;</span>]) <span style="color: #008800; font-weight: bold">for</span> x <span style="color: #000000; font-weight: bold">in</span> list_input_data]
 
-slot1<span style="color: #666666">.</span>write(out)
-</pre></div> 
+elmo_vecs <span style="color: #333333">=</span> np<span style="color: #333333">.</span>concatenate(elmo_vecs, axis <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">0</span>)
+
+<span style="color: #888888"># Loading the trained XGBoost model in order to score elmo vectors of input data</span>
+loaded_model <span style="color: #333333">=</span> pickle<span style="color: #333333">.</span>load(<span style="color: #007020">open</span>(<span style="background-color: #fff0f0">&quot;ELMO_nlp_xgboost.pickle&quot;</span>,<span style="background-color: #fff0f0">&quot;rb&quot;</span>))
+
+<span style="color: #888888"># Producing Predictions/scores</span>
+predictions <span style="color: #333333">=</span> loaded_model<span style="color: #333333">.</span>predict(xgb<span style="color: #333333">.</span>DMatrix(elmo_vecs))
+
+out <span style="color: #333333">=</span> pd<span style="color: #333333">.</span>Series(predictions)
+
+<span style="color: #888888"># Writing predictions to the defaul output slot, Slot(1)</span>
+slot1<span style="color: #333333">.</span>write(out)
+</pre></div>
+
+
 <br>
 
 <p>Here are the options for model annotations in FastScore to control the behavior of the model in FastScore:</p>
@@ -437,7 +459,7 @@ this example</a>. Both will run within the latest versions of the FastScore Engi
 
 <p>Once we’ve defined this, we need to add the model execution script to FastScore with the following command:</p>
 <p><code class="highlighter-rouge">fastscore model add &lt;model-name&gt; &lt;source-file&gt;</code><br>
-<code class="highlighter-rouge">fastscore model add ELMo_nlp-py3 library/models/ELMo_nlp.py3</code></p>
+<code class="highlighter-rouge">fastscore model add ELMo_nlp library/models/ELMo_nlp.py3</code></p>
 
 <h3 id="4-attachments"><a name="attachments"></a>4. Attachments</h3>
 <p>Attachments consist of external files to be utilized during prediction or scoring. 
@@ -445,13 +467,13 @@ The contents of the attachment get extracted into the current working directory 
 Attachments will be tracked in Model Manage and Git if we’re using the integration, so they are recommended to be less than 20MB. 
 Larger artifacts can be added to the Engine via the Dockerfile.</p>
 
-<p>In our example, we reference <code class="highlighter-rouge">ELMo_nlp_xgboost.pickle</code> 
+<p>In our example, we reference <code class="highlighter-rouge">ELMO_nlp_xgboost.pickle</code> 
 which is our trained model that we will use for predictions. FastScore will unpack the file in the working directory 
-so the model can utilize it. To add it to FastScore, we upload it to the model and add it to Model Manage 
+so the model can utilize it. To add it to FastScore, we upload it the model and add it to Model Manage 
 with the following CLI command:</p>
 
 <p><code class="highlighter-rouge">fastscore attachment upload &lt;model-name&gt; &lt;file-to-attach&gt;</code><br>
-<code class="highlighter-rouge">fastscore attachment upload ELMo_nlp-py3 library/attachments/ELMo_nlp_xgboost.tar.gz</code></p>
+<code class="highlighter-rouge">fastscore attachment upload ELMo_nlp library/attachments/ELMo_nlp_xgboost.tar.gz</code></p>
 
 <h3 id="5-streams"><a name="streams"></a>5. Streams</h3>
 <p>Streams in FastScore define the integration to our data pipeline. 
@@ -463,13 +485,13 @@ For this example, we will be deploying and testing the model as REST.</p>
 While the arbitrary REST endpoints are not realistic for production, they are an extremely handy approach for quick testing. 
 We can also define the REST stream as a JSON file to be added and tracked in Model Manage:
 <!-- HTML generated using hilite.me -->
-<div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+</p><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
     <pre style="margin: 0; line-height: 125%">{
-  <span style="color: #008000; font-weight: bold">&quot;Transport&quot;</span>: <span style="color: #BA2121">&quot;REST&quot;</span>,
-  <span style="color: #008000; font-weight: bold">&quot;Encoding&quot;</span>: <span style="color: #BA2121">&quot;json&quot;</span>
+  <span style="color: #008000; font-weight: bold">"Transport"</span>: <span style="color: #BA2121">"REST"</span>,
+  <span style="color: #008000; font-weight: bold">"Encoding"</span>: <span style="color: #BA2121">"json"</span>
 }
 </pre></div>
-</p>
+<p></p>
 
 <p>To add a stream, we use the following CLI command:</p>
 <p><code class="highlighter-rouge">fastscore stream add &lt;stream-name&gt; &lt;file-name&gt;</code><br>
@@ -483,8 +505,7 @@ for the input and output slots.</p>
 <p>Generic commands for deploying a model:</p>
 <div class="highlighter-rouge">
     <div class="highlight">
-        <pre class="highlight">
-<code>fastscore use &lt;engine-name&gt;
+        <pre class="highlight"><code>fastscore use &lt;engine-name&gt;
 fastscore engine reset
 fastscore run &lt;model-name&gt; rest: rest:
 fastscore engine inspect</code>
@@ -494,10 +515,9 @@ fastscore engine inspect</code>
 
 <div class="highlighter-rouge">
     <div class="highlight">
-        <pre class="highlight">
-<code>fastscore use engine-1
+        <pre class="highlight"><code>fastscore use engine-1
 fastscore engine reset
-fastscore run ELMo_nlp-py3 rest: rest:
+fastscore run ELMo_nlp rest: rest:
 fastscore engine inspect</code>
 </pre></div></div>
 
@@ -508,17 +528,16 @@ there was most likely an issue with the <a href="#model-dependencies">Model Depe
 the <a href="#attachments">Attachment</a> or how they were referenced in the 
 <a href="#model-execution-script">Model Execution Script</a>. 
 Check the logs of the Engine to investigate the error messages: 
-<pre class="highlight"><code>docker logs &lt;container-id or container-name&gt;</code></pre></p>
+</p><pre class="highlight"><code>docker logs &lt;container-id or container-name&gt;</code></pre><p></p>
 
 <h2 id="test-model"><a name="Test-Model"></a>Test Model</h2>
 <p>Finally, we’re going to send data to the model to test the Model Deployment Package entirely for prediction. 
-To send data contained in <code class="highlighter-rouge">ELMo_input_data.json</code> 
+To send data contained in <code class="highlighter-rouge">input_data.json</code> 
 via the CLI, and retrieve predictions, we use the following commands:</p>
 
 <div class="highlighter-rouge">
     <div class="highlight">
-        <pre class="highlight">
-<code>cat data/ELMo_input_data.json | fastscore model input
+        <pre class="highlight"><code>cat data/ELMo_input_data.json | fastscore model input
 fastscore model output -c</code>
 </pre></div></div>
 
