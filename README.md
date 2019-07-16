@@ -379,15 +379,15 @@ elmo <span style="color: #333333">=</span> hub<span style="color: #333333">.</sp
 <span style="color: #007020">globals</span>()<span style="color: #333333">.</span>update(<span style="color: #007020">locals</span>())
 
 <span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">elmo_vectors</span>(x):
-    <span style="color: #DD4422">&quot;&quot;&quot;A function to compute ELMo embeddings&quot;&quot;&quot;</span>
-    embeddings <span style="color: #333333">=</span> elmo(x<span style="color: #333333">.</span>tolist(), signature<span style="color: #333333">=</span><span style="background-color: #fff0f0">&quot;default&quot;</span>, as_dict<span style="color: #333333">=</span><span style="color: #008800; font-weight: bold">True</span>)[<span style="background-color: #fff0f0">&quot;elmo&quot;</span>]
-    <span style="color: #008800; font-weight: bold">with</span> tf<span style="color: #333333">.</span>compat<span style="color: #333333">.</span>v1<span style="color: #333333">.</span>Session() <span style="color: #008800; font-weight: bold">as</span> sess:
-        <span style="color: #888888"># sess.run(tf.global_variables_initializer())</span>
-        sess<span style="color: #333333">.</span>run(tf<span style="color: #333333">.</span>compat<span style="color: #333333">.</span>v1<span style="color: #333333">.</span>global_variables_initializer())
-        <span style="color: #888888"># sess.run(tf.tables_initializer())</span>
-        sess<span style="color: #333333">.</span>run(tf<span style="color: #333333">.</span>compat<span style="color: #333333">.</span>v1<span style="color: #333333">.</span>tables_initializer())
-        <span style="color: #888888"># return average of ELMo features</span>
-        <span style="color: #008800; font-weight: bold">return</span> sess<span style="color: #333333">.</span>run(tf<span style="color: #333333">.</span>reduce_mean(embeddings,<span style="color: #0000DD; font-weight: bold">1</span>))
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #DD4422">&quot;&quot;&quot;A function to compute ELMo embeddings&quot;&quot;&quot;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;embeddings <span style="color: #333333">=</span> elmo(x<span style="color: #333333">.</span>tolist(), signature<span style="color: #333333">=</span><span style="background-color: #fff0f0">&quot;default&quot;</span>, as_dict<span style="color: #333333">=</span><span style="color: #008800; font-weight: bold">True</span>)[<span style="background-color: #fff0f0">&quot;elmo&quot;</span>]
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #008800; font-weight: bold">with</span> tf<span style="color: #333333">.</span>compat<span style="color: #333333">.</span>v1<span style="color: #333333">.</span>Session() <span style="color: #008800; font-weight: bold">as</span> sess:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #888888"># sess.run(tf.global_variables_initializer())</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sess<span style="color: #333333">.</span>run(tf<span style="color: #333333">.</span>compat<span style="color: #333333">.</span>v1<span style="color: #333333">.</span>global_variables_initializer())
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #888888"># sess.run(tf.tables_initializer())</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sess<span style="color: #333333">.</span>run(tf<span style="color: #333333">.</span>compat<span style="color: #333333">.</span>v1<span style="color: #333333">.</span>tables_initializer())
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #888888"># return average of ELMo features</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #008800; font-weight: bold">return</span> sess<span style="color: #333333">.</span>run(tf<span style="color: #333333">.</span>reduce_mean(embeddings,<span style="color: #0000DD; font-weight: bold">1</span>))
 
 <span style="color: #888888"># Let us now extract ELMo embeddings of text data</span>
 <span style="color: #007020">globals</span>()<span style="color: #333333">.</span>update(<span style="color: #007020">locals</span>())
@@ -407,7 +407,6 @@ out <span style="color: #333333">=</span> pd<span style="color: #333333">.</span
 <span style="color: #888888"># Writing predictions to the defaul output slot, Slot(1)</span>
 slot1<span style="color: #333333">.</span>write(out)
 </pre></div>
-
 
 <br>
 
@@ -559,7 +558,7 @@ make deploy
 fastscore schema add three_strings library/schemas/three-strings.avsc
 fastscore schema add double library/schemas/double.avsc
 fastscore model add ELMo_nlp-py3 library/models/ELMo_nlp.py3
-fastscore attachment upload ELMo_nlp-py3 library/attachments/ELMo_nlp_xgboost.tar.gz
+fastscore attachment upload ELMo_nlp-py3 library/attachments/ELMO_nlp_xgboost.tar.gz
 fastscore stream add rest library/streams/rest.json
 fastscore use engine-1
 fastscore engine reset
