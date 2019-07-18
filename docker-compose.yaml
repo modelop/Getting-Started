@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   dashboard:
-    image: fastscore/dashboard:1.9
+    image: fastscore/dashboard:1.10
     ports:
         - "8000:8000"
     environment:
