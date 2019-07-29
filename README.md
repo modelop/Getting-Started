@@ -496,6 +496,8 @@ We can also define the REST stream as a JSON file to be added and tracked in Mod
 <p><code class="highlighter-rouge">fastscore stream add &lt;stream-name&gt; &lt;file-name&gt;</code><br>
 <code class="highlighter-rouge">fastscore stream add rest library/streams/rest.json</code></p>
 
+<p>Generic stream descriptors can be found <a href="https://opendatagroup.github.io/Product%20Manuals/Stream%20Descriptors/">here</a>. Streams can be managed from the FastScore CLI; to see an example, click <a href="https://opendatagroup.github.io/Reference/FastScore%20CLI/#stream">here</a>.
+
 <h2 id="deploy-as-rest"><a name="Deploy-as-REST"></a>Deploy as REST</h2>
 <p>Now that we have the Model Deployment Package defined and added to FastScore, it’s time to deploy it in the Engine and test as REST. 
 Using <code class="highlighter-rouge">rest:</code> for the streams in the run command will generate an endpoint 
