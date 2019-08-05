@@ -12,6 +12,12 @@ modeldeploy: stop
 	bash -x setup.sh
 	bash -x load.sh
 
+dbdeploy: stop
+	docker swarm init
+	docker stack deploy -c docker-compose-db.yaml --resolve-image changed fs-vanilla
+	bash -x setup.sh
+	bash -x load.sh
+
 deploysecrets: stop
 	docker swarm init
 	cd credentials && ./loadSecrets.sh

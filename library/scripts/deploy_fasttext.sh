@@ -1,4 +1,4 @@
-fastscore use engine-1
+fastscore use engine-7
 fastscore engine reset
 fastscore run fasttext-py3 rest: rest:
 

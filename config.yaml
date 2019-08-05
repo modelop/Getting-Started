@@ -11,11 +11,11 @@ fastscore:
       port: 8003
 
   db:
-    type: mysql
-    host: database
-    port: 3306
-    username: root
-    password: root
+    type: git
+    url: https://github.com/brenstenkelly/backitup.git 
+    branch: master
+    username: brenstenkelly 
+    password: ODG4evaeva
 
   pneumo:
     type: REST
