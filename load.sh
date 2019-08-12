@@ -28,3 +28,9 @@ fastscore attachment upload xgboost_iris-py3 library/attachments/xgboost_explici
 fastscore attachment upload lr-champion-py3 library/attachments/lr_pickle1.tar.gz
 fastscore attachment upload lr-challenger-py3 library/attachments/lr_pickle2.tar.gz
 fastscore attachment upload xgboost_iris_backtest-py3 library/attachments/xgboost_explicit.tar.gz
+
+
+fastscore attachment upload hp_lasso-py3 library/attachments/hp_comparison.tar.gz
+fastscore attachment upload hp_ridge-py3 library/attachments/hp_comparison.tar.gz
+fastscore attachment upload hp_xgboost-py3 library/attachments/hp_comparison.tar.gz
+fastscore attachment upload input_monitor-py3 library/attachments/hp_comparison.tar.gz
