@@ -33,4 +33,5 @@ fastscore attachment upload xgboost_iris_backtest-py3 library/attachments/xgboos
 fastscore attachment upload hp_lasso-py3 library/attachments/hp_comparison.tar.gz
 fastscore attachment upload hp_ridge-py3 library/attachments/hp_comparison.tar.gz
 fastscore attachment upload hp_xgboost-py3 library/attachments/hp_comparison.tar.gz
-fastscore attachment upload input_monitor-py3 library/attachments/hp_comparison.tar.gz
+fastscore attachment upload hp_input_monitor-py3 library/attachments/streamstats.tar.gz
+fastscore attachment upload xgb_model-py3 library/attachments/hp_xgb_pickle1.tar.gz
