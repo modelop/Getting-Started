@@ -1,0 +1,6 @@
+{"type": "record",
+ "name": "Price",
+ "fields": [
+    {"name":"predicted_price", "type":"double"}
+]}
+ 

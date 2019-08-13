@@ -1,0 +1,210 @@
+{
+    "fields": [
+        {
+            "name": "BsmtUnfSF",
+            "type": "double"
+        },
+        {
+            "name": "TotalBsmtSF",
+            "type": "double"
+        },
+        {
+            "name": "BsmtFullBath",
+            "type": "double"
+        },
+        {
+            "name": "FireplaceQu",
+            "type": "string"
+        },
+        {
+            "name": "GarageCars",
+            "type": "double"
+        },
+        {
+            "name": "MoSold",
+            "type": "double"
+        },
+        {
+            "name": "OverallCond",
+            "type": "double"
+        },
+        {
+            "name": "BsmtExposure",
+            "type": "string"
+        },
+        {
+            "name": "SecondFlrSF",
+            "type": "double"
+        },
+        {
+            "name": "HalfBath",
+            "type": "double"
+        },
+        {
+            "name": "ScreenPorch",
+            "type": "double"
+        },
+        {
+            "name": "SalePrice",
+            "type": "double"
+        },
+        {
+            "name": "Total_porch_sf",
+            "type": "double"
+        },
+        {
+            "name": "MasVnrArea",
+            "type": "double"
+        },
+        {
+            "name": "BsmtFinType1",
+            "type": "string"
+        },
+        {
+            "name": "GarageArea",
+            "type": "double"
+        },
+        {
+            "name": "has_fireplace",
+            "type": "double"
+        },
+        {
+            "name": "OverallQual",
+            "type": "double"
+        },
+        {
+            "name": "BsmtFinSF2",
+            "type": "double"
+        },
+        {
+            "name": "FirstFlrSF",
+            "type": "double"
+        },
+        {
+            "name": "TotRmsAbvGrd",
+            "type": "double"
+        },
+        {
+            "name": "OpenPorchSF",
+            "type": "double"
+        },
+        {
+            "name": "has_pool",
+            "type": "double"
+        },
+        {
+            "name": "has_bsmt",
+            "type": "double"
+        },
+        {
+            "name": "BldgType",
+            "type": "string"
+        },
+        {
+            "name": "GrLivArea",
+            "type": "double"
+        },
+        {
+            "name": "KitchenAbvGr",
+            "type": "double"
+        },
+        {
+            "name": "Fireplaces",
+            "type": "double"
+        },
+        {
+            "name": "Total_Bathrooms",
+            "type": "double"
+        },
+        {
+            "name": "BsmtFinSF1",
+            "type": "double"
+        },
+        {
+            "name": "Alley",
+            "type": "string"
+        },
+        {
+            "name": "YearRemodAdd",
+            "type": "double"
+        },
+        {
+            "name": "BsmtQual",
+            "type": "string"
+        },
+        {
+            "name": "KitchenQual",
+            "type": "string"
+        },
+        {
+            "name": "GarageYrBlt",
+            "type": "double"
+        },
+        {
+            "name": "EnclosedPorch",
+            "type": "double"
+        },
+        {
+            "name": "TotalSF",
+            "type": "double"
+        },
+        {
+            "name": "LotFrontage",
+            "type": "double"
+        },
+        {
+            "name": "BsmtHalfBath",
+            "type": "double"
+        },
+        {
+            "name": "BedroomAbvGr",
+            "type": "double"
+        },
+        {
+            "name": "PavedDrive",
+            "type": "string"
+        },
+        {
+            "name": "WoodDeckSF",
+            "type": "double"
+        },
+        {
+            "name": "LandContour",
+            "type": "string"
+        },
+        {
+            "name": "YearBuilt",
+            "type": "double"
+        },
+        {
+            "name": "CentralAir",
+            "type": "string"
+        },
+        {
+            "name": "FullBath",
+            "type": "double"
+        },
+        {
+            "name": "GarageFinish",
+            "type": "string"
+        },
+        {
+            "name": "MiscVal",
+            "type": "double"
+        },
+        {
+            "name": "YrSold",
+            "type": "double"
+        },
+        {
+            "name": "has_garage",
+            "type": "double"
+        },
+        {
+            "name": "LotArea",
+            "type": "double"
+        }
+    ],
+    "name": "recb64ec7a4",
+    "type": "record"
+}
