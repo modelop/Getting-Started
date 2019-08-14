@@ -227,6 +227,7 @@ spec:
   template:
     metadata:
       annotations:
+        beta.kubernetes.io/instance-type: t2.large
       labels:
         service: engine-4
         app: engine-4
@@ -261,6 +262,8 @@ spec:
       - emptyDir: {}
         name: temp-dir
       restartPolicy: Always
+      nodeSelector:
+        beta.kubernetes.io/instance-type: t2.large
 status: {}
 ---
 apiVersion: v1
