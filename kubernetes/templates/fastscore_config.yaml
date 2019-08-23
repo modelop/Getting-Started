@@ -1,0 +1,27 @@
+fastscore:
+  fleet:
+    - api: model-manage
+      host: model-manage
+      port: 8002
+    - api: engine
+      host: engine-1
+      port: 8003
+      name: engine-1
+    - api: engine
+      host: engine-2
+      port: 8003
+      name: engine-2
+    - api: engine
+      host: engine-3
+      port: 8003
+      name: engine-3
+
+#  pneumo:
+#    type: REST
+
+  pneumo:
+    type: kafka
+    bootstrap:
+      - kafka:9092
+    topic: notify
+

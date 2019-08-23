@@ -1,0 +1,144 @@
+#
+# This is a full kubernetes install of the microservices architecture.  Once the pod is running, all services can
+# be accessed through the gateway located at localhost:8090.  Going directly to localhost:8090 will also bring up
+# the GUI
+#
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fastscore
+  labels:
+    app: fastscore
+    version: v1
+    role: backend
+    stack: fastscore
+spec:
+  containers:
+    - name: dashboard
+      image: fastscore/dashboard:1.10
+      ports:
+        - containerPort: 8000
+      env:
+        - name: CONNECT_PREFIX
+          value: https://fastscore:8001
+    - name: connect
+      image: fastscore/connect:1.10
+      ports:
+        - containerPort: 8001
+    - name: engine
+      image: fastscore/engine:1.10
+      ports:
+        - containerPort: 8003
+      env:
+        - name: CONNECT_PREFIX
+          value: https://fastscore:8001
+    - name: demo
+      image: fastscore/fastscore-demo:1.0
+    - name: reporting-service
+      image: fastscore/fastscore-response-service:1.0
+      ports:
+        - containerPort: 8091
+    - name: eureka
+      image: fastscore/fastscore-eureka:1.0
+      ports:
+        - containerPort: 8761
+    - name: model-manage
+      image: fastscore/java-model-manage:1.0
+      ports:
+        - containerPort: 8086
+          name: mm-https
+        - containerPort: 8088
+          name: mm-http
+    - name: gateway
+      image: fastscore/fastscore-gateway:1.0
+      ports:
+        - containerPort: 8090
+      env:
+        - name: CONNECT_PREFIX
+          value: https://fastscore:8001
+    - name: proxy
+      image: fastscore/fastscore-proxy:1.0
+      ports:
+        - containerPort: 8084
+      env:
+        - name: CONNECT_PREFIX
+          value: https://fastscore:8001
+    - name: mlc
+      image: fastscore/fastscore-mdlc:1.0
+      ports:
+        - containerPort: 8085
+    - name: odg-jupyter
+      image: fastscore/odg-jupyter:1.0
+      ports:
+        - containerPort: 8888
+    - name: kafka
+      image: fastscore/kub-kafka:1.0
+      ports:
+        - containerPort: 9092
+      env:
+        - name: CONNECT_PREFIX
+          value: https://fastscore:8001
+    - name: mongodb
+      image: mvertes/alpine-mongo:latest
+      ports:
+        - containerPort: 27017
+  imagePullSecrets:
+    - name: myregistrykey
+  nodeSelector:
+    beta.kubernetes.io/instance-type: m5.xlarge
+
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: fastscore
+spec:
+  selector:
+    app: fastscore
+  ports:
+    - name: kafka
+      port: 9092
+      targetPort: 9092
+    - name: eureka
+      protocol: TCP
+      port: 8761
+      targetPort: 8761
+    - name: dashboard
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+    - name: engine
+      protocol: TCP
+      port: 8003
+      targetPort: 8003
+    - name: gateway
+      protocol: TCP
+      port: 8090
+      targetPort: 8090
+    - name: reporting-service
+      protocol: TCP
+      port: 8091
+      targetPort: 8091
+    - name: proxy
+      protocol: TCP
+      port: 8084
+      targetPort: 8084
+    - name: mm-https
+      port: 8086
+      targetPort: 8086
+    - name: mm-http
+      port: 8088
+      targetPort: 8088
+    - name: mlc
+      port: 8085
+      targetPort: 8085
+    - name: odg-jupyter
+      port: 8888
+      targetPort: 8888
+    - name: mongodb
+      port: 27017
+      targetPort: 27017
+  type: LoadBalancer
