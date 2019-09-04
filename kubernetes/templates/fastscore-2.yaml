@@ -45,7 +45,7 @@ spec:
       ports:
         - containerPort: 8761
     - name: model-manage
-      image: fastscore/java-model-manage:1.0
+      image: fastscore/java-model-manage:jim-branch
       ports:
         - containerPort: 8086
           name: mm-https
