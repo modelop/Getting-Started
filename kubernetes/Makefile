@@ -88,10 +88,9 @@ stack-release:
 	kubectl apply -f ./implementation/manifests/release/${deployment_type}
 
 stop-2:
-	kubectl delete all -l stack=fastscore
-	kubectl delete service fastscore
+	#kubectl delete all -l stack=fastscore
 	kubectl delete pod fastscore
 deploy-2:
 	kubectl apply -f ./templates/fastscore-2.yaml
 	kubectl apply -f ./templates/fastscore-aux.yaml
-	kubectl apply -f ./templates/fastscore-engines-2.yaml
+	#kubectl apply -f ./templates/fastscore-engines-2.yaml

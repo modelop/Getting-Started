@@ -13,137 +13,58 @@
 # e.g. `kubectl create secret generic <secretname> --from-file=./path/to/file/containing/secret
 # See README.md in this project for more specific information
 
+---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    service: influxdb
-    app: influxdb
+    service: dash
+    app: dash
     stack: fastscore
-  name: influxdb
+  name: dash
 spec:
   ports:
-  - name: 8083-tcp
-    port: 8083
+  - name: 8061-tcp
+    port: 8061
     protocol: TCP
-    targetPort: 8083
-  - name: 8086-tcp
-    port: 8086
-    protocol: TCP
-    targetPort: 8086
-  - name: 8090-tcp
-    port: 8090
-    protocol: TCP
-    targetPort: 8090
+    targetPort: 8061
   selector:
-    service: influxdb
-    app: influxdb
+    service: dash
+    app: dash
     stack: fastscore
   sessionAffinity: None
-  type: ClusterIP
+  type: LoadBalancer
 status:
   loadBalancer: {}
+
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: influxdb
+  name: dash
   labels:
-    service: influxdb
-    app: influxdb
+    service: dash
+    app: dash
     stack: fastscore
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        service: influxdb
-        app: influxdb
+        service: dash
+        app: dash
         stack: fastscore
     spec:
       containers:
-      - name: influxdb
-        image: fastscore/influx:1.9
-        env:
-        - name: INFLUXDB_DATA_ENGINE
-          value: "tsm1"
+      - name: dash
+        image: fastscore/demo-dash:latest
+        imagePullPolicy: Always
         ports:
-        - containerPort: 8083
-          protocol: TCP
-        - containerPort: 8086
-          protocol: TCP
-        - containerPort: 8090
-          protocol: TCP
-        volumeMounts:
-        - mountPath: /var/lib/influxdb
-          name: influxdb-data-dir
-        resources: {}
-        stdin: true
-        tty: true
-      volumes:
-      - name: influxdb-data-dir
-        emptyDir: {}
-      restartPolicy: Always
-status: {}
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: viz
-  labels:
-    service: viz
-    app: viz
-    stack: fastscore
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        service: viz
-        app: viz
-        stack: fastscore
-    spec:
-      containers:
-      - name: viz
-        image: fastscore/viz:dev
-        env:
-        - name: GF_AUTH_ANONYMOUS_ENABLED
-          value: "true"
-# ROOT_URL needs to be set to this for Access reverse-proxy to function properly
-        - name: GF_SERVER_ROOT_URL
-          value: "%(protocol)s://%(domain)s/viz/"
-        ports:
-        - containerPort: 3000
+        - containerPort: 8061
           protocol: TCP
         resources: {}
         stdin: true
         tty: true
 # 'fsGroup' setting is required for permissions to the persistentVolumeClaim
-      securityContext:
-        fsGroup: 472
       volumes:
 status: {}
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    service: viz
-    app: viz
-    stack: fastscore
-  name: viz
-spec:
-  ports:
-  - name: 3000-tcp
-    port: 3000
-    protocol: TCP
-    targetPort: 3000
-  selector:
-    service: viz
-    app: viz
-    stack: fastscore
-  sessionAffinity: None
-  type: ClusterIP
-status:
-  loadBalancer: {}
-

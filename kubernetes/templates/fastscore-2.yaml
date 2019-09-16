@@ -28,14 +28,19 @@ spec:
       ports:
         - containerPort: 8001
     - name: engine
-      image: fastscore/engine:1.10
+      image: fastscore/engine:enron-ecomm
       ports:
         - containerPort: 8003
       env:
         - name: CONNECT_PREFIX
           value: https://fastscore:8001
+    - name: dash
+      image: fastscore/demo-dash:latest
+      ports:
+        - containerPort: 8061
     - name: demo
       image: fastscore/fastscore-demo:1.0
+      imagePullPolicy: Always
     - name: reporting-service
       image: fastscore/fastscore-response-service:1.0
       ports:
@@ -45,7 +50,7 @@ spec:
       ports:
         - containerPort: 8761
     - name: model-manage
-      image: fastscore/java-model-manage:jim-branch
+      image: fastscore/java-model-manage:2.0
       ports:
         - containerPort: 8086
           name: mm-https
@@ -53,6 +58,7 @@ spec:
           name: mm-http
     - name: gateway
       image: fastscore/fastscore-gateway:1.0
+      imagePullPolicy: Always
       ports:
         - containerPort: 8090
       env:
@@ -60,6 +66,7 @@ spec:
           value: https://fastscore:8001
     - name: proxy
       image: fastscore/fastscore-proxy:1.0
+      imagePullPolicy: Always
       ports:
         - containerPort: 8084
       env:
@@ -67,6 +74,7 @@ spec:
           value: https://fastscore:8001
     - name: mlc
       image: fastscore/fastscore-mdlc:1.0
+      imagePullPolicy: Always
       ports:
         - containerPort: 8085
     - name: odg-jupyter
@@ -86,8 +94,8 @@ spec:
         - containerPort: 27017
   imagePullSecrets:
     - name: myregistrykey
-  nodeSelector:
-    beta.kubernetes.io/instance-type: m5.xlarge
+#  nodeSelector:
+#    beta.kubernetes.io/instance-type: m5.xlarge
 
 
 ---
