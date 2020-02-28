@@ -12,7 +12,7 @@ fastscore:
 
   db:
     type: mysql
-    host: database
+    host: mm-mysql
     port: 3306
     username: root
     password: root
